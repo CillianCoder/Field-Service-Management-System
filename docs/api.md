@@ -1,0 +1,44 @@
+# API
+
+Next.js App Router — no separate REST API. Data access via **Server Actions / Route Handlers** backed by Prisma. All server actions must re-validate and authorize.
+
+## Conventions
+- **Auth**: Better Auth sessions (email/password). Session persists after refresh.
+- **Authorization**: every protected server action checks role server-side. Not just hidden buttons.
+- **Validation**: Zod schemas for all untrusted form data (`lib/validations/`).
+- **Errors**: user-facing messages; never expose stack traces.
+- **Data flow**: react hook form (optional) → server action → Zod → Prisma.
+
+## Route map
+| Route | Main User | Purpose |
+|-------|-----------|---------|
+| `/login` | All | Sign in |
+| `/dashboard` | Admin, Dispatcher | Operations summary |
+| `/users` | Admin | Manage accounts & roles |
+| `/customers` | Admin, Dispatcher | Customer CRUD |
+| `/technicians` | Admin, Dispatcher | Technician CRUD |
+| `/work-orders` | Admin, Dispatcher | List, filter, manage |
+| `/work-orders/new` | Admin, Dispatcher | Create work order |
+| `/work-orders/[id]` | Role-based | View/update single job |
+| `/my-jobs` | Technician | Assigned jobs only |
+
+## Key actions
+| Action | Roles | Server rule |
+|--------|-------|-------------|
+| Manage users/roles | Admin only | 403 otherwise |
+| Create customers | Admin, Dispatcher | duplicate email blocked |
+| Create technicians | Admin, Dispatcher | userId link required |
+| Create WOs | Admin, Dispatcher | customer, title, desc, scheduled date required |
+| Assign technician | Admin, Dispatcher | sets ASSIGNED |
+| View WOs | Admin, Dispatcher | all |
+| View jobs | Technician | own only |
+| Start work | all (own) | requires assigned technician |
+| Complete job | all (own) | completion notes required |
+
+## Error responses
+- Invalid form → field-level Zod messages.
+- Unauthorized → redirect to login (or role-appropriate page).
+- Duplicate email → clear message on the field.
+
+## Offline / sync
+Not in scope. Web-only, live connection via server actions.
