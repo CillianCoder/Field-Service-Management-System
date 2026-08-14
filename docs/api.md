@@ -9,6 +9,11 @@ Next.js App Router — no separate REST API. Data access via **Server Actions / 
 - **Errors**: user-facing messages; never expose stack traces.
 - **Data flow**: react hook form (optional) → server action → Zod → Prisma.
 
+Better Auth is mounted at `/api/auth/[...all]`. Public sign-up is disabled;
+administrator-managed account creation will be added with the user-management
+feature. Credential password hashes are stored in Better Auth's `Account`
+model.
+
 ## Route map
 | Route | Main User | Purpose |
 |-------|-----------|---------|

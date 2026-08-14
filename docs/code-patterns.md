@@ -61,10 +61,13 @@ One Prisma client instance, no `prisma = new PrismaClient()` per request.
 
 ```ts
 // lib/prisma.ts
-import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+
+import { PrismaClient } from "@/generated/prisma/client";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 ```
@@ -100,19 +103,9 @@ Idempotent seed with `upsert` so it can run repeatedly without duplicates.
 
 ```ts
 // prisma/seed.ts
-const emails = {
-  admin: "admin@fieldflow.test",
-  dispatcher: "dispatch@fieldflow.test",
-  technician: "tech@fieldflow.test",
-};
-
-for (const [name, email] of Object.entries(emails)) {
-  await prisma.user.upsert({
-    where: { email },
-    update: {},
-    create: { email, name, passwordHash: await hashPassword(name) },
-  });
-}
+const passwordHash = await hashPassword(process.env.DEMO_PASSWORD!);
+// Upsert User and Account separately. Better Auth stores credential hashes in
+// Account.password, not User.passwordHash.
 ```
 
 Password hashing is handled by the auth library (never store plain text).

@@ -1,13 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f7f8;
-  --surface: #eef1f3;
+  --background: #f8fafc;
+  --surface: #f1f5f9;
   --panel: #ffffff;
-  --foreground: #17202a;
-  --muted: #59636e;
-  --border: #d5dce1;
-  --accent: #087f5b;
+  --foreground: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --input: #cbd5e1;
+  --input-hover: #94a3b8;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --error-subtle: #fef2f2;
+  --error-border: #fecaca;
+  --error-text: #991b1b;
 }
 
 @theme inline {
@@ -17,7 +23,13 @@
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-hover: var(--input-hover);
   --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-error-subtle: var(--error-subtle);
+  --color-error-border: var(--error-border);
+  --color-error-text: var(--error-text);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -34,7 +46,7 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
 button,
@@ -45,6 +57,11 @@ textarea {
 }
 
 :focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--accent) 50%, transparent);
   outline-offset: 3px;
+}
+
+::selection {
+  background: #dbeafe;
+  color: var(--foreground);
 }

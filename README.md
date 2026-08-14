@@ -15,9 +15,10 @@ technicians and tracking work from assignment through completion.
 
 1. Install dependencies with `npm install`.
 2. Copy `.env.example` to `.env` and provide local database and auth values.
-3. Generate the Prisma client with `npm run db:generate` after the database
-   schema is introduced.
-4. Start the application with `npm run dev`.
+3. Run `npm run db:generate`.
+4. Create and apply the first migration with `npm run db:migrate`.
+5. Set `DEMO_PASSWORD`, then run `npm run db:seed`.
+6. Start the application with `npm run dev`.
 
 The development server runs at `http://localhost:3000`.
 
@@ -44,12 +45,10 @@ The development server runs at `http://localhost:3000`.
 
 ## Scaffold Status
 
-The application shell, configuration, dependency boundaries, environment
-template, and Playwright smoke test are in place. The Better Auth-compatible
-Prisma schema and database migrations are intentionally deferred to the
-authentication feature so the documented custom `User.passwordHash` model can
-be reconciled with Better Auth's account and session models before data is
-created.
+The responsive login flow, Better Auth route, Prisma 7 schema, session-aware
+role redirects, and protected destination placeholders are implemented. The
+operations, customer, technician, and work-order screens are the next feature
+phase.
 
 No real credentials or customer data belong in this repository. Use only the
 placeholder values in `.env.example`; local and deployment secrets must be

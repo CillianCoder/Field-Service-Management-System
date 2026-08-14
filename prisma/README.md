@@ -1,5 +1,7 @@
 # Prisma
 
-Database models, migrations, and seed data will be added with the authentication and data-model implementation.
+The Prisma schema contains the Better Auth tables and FieldFlow domain models. Generate the client after schema changes and create a reviewed migration before applying model changes to shared environments.
 
-The Better Auth schema must be reconciled with `docs/data-model.md` before the first migration is created. Do not add a custom `passwordHash` field alongside Better Auth credential accounts without an approved integration design.
+Better Auth owns credential hashes in `Account.password`. FieldFlow extends `User` with the application `Role`; do not add a separate `User.passwordHash` field.
+
+The seed is idempotent and creates the documented demo users and credential accounts. Set `DATABASE_URL` and `DEMO_PASSWORD` before running `npm run db:seed`.

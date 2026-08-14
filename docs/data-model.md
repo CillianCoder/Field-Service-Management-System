@@ -1,18 +1,47 @@
 # Data Model
 
-## Entities (5 core models)
+## Entities
 
 ### User (via Better Auth)
 ```prisma
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  passwordHash  String
-  role          Role      @default(TECHNICIAN)
-  name          String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id            String              @id
+  name          String
+  email         String              @unique
+  emailVerified Boolean             @default(false)
+  image         String?
+  role          Role                @default(TECHNICIAN)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  accounts      Account[]
+  sessions      Session[]
   technician    Technician?
+  activities    WorkOrderActivity[]
+}
+
+model Account {
+  id          String  @id
+  accountId   String
+  providerId  String
+  userId      String
+  password    String?
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // OAuth token fields are omitted here for brevity.
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
 }
 
 enum Role {
@@ -113,6 +142,7 @@ model WorkOrderActivity {
 
 ## Relationships
 - User 1:1 Technician (optional)
+- User 1:N Account and Session (owned by Better Auth)
 - Customer 1:N WorkOrder
 - Technician 1:N WorkOrder
 - WorkOrder 1:N WorkOrderActivity
@@ -120,8 +150,12 @@ model WorkOrderActivity {
 
 ## Schema / migrations
 - Prisma schema in `prisma/schema.prisma`.
+- Prisma 7 client output is generated into `generated/prisma` and uses the
+  PostgreSQL driver adapter in `lib/prisma.ts`.
 - Migrations via `npx prisma migrate dev`.
 - Seed via `npx prisma db seed` (`prisma/seed.ts`).
+- Passwords are hashed by Better Auth and stored in `Account.password`; do not
+  add a `User.passwordHash` field.
 
 ## Statuses & state machine
 Job flow (server-enforced):
