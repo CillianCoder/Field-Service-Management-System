@@ -18,6 +18,7 @@ model.
 | Route | Main User | Purpose |
 |-------|-----------|---------|
 | `/login` | All | Sign in |
+| `/forgot-password` | All | Validate a recovery email and show administrator guidance |
 | `/dashboard` | Admin, Dispatcher | Operations summary |
 | `/users` | Admin | Manage accounts & roles |
 | `/customers` | Admin, Dispatcher | Customer CRUD |
@@ -47,3 +48,9 @@ model.
 
 ## Offline / sync
 Not in scope. Web-only, live connection via server actions.
+
+## Future auth improvements
+- Configure Better Auth's `sendResetPassword` callback with Resend.
+- Add secure reset-link expiry, invalid-token handling, and a reset-password page.
+- Until email delivery is configured, `/forgot-password` sends no request and does
+	not claim an email was sent or reveal whether an account exists.
