@@ -18,6 +18,7 @@ Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
 | FR-08 | Every status change logged with user + timestamp | system | WorkOrderActivity |
 | FR-09 | Duplicate email rejected (Customer + Technician) | system | data-model.md |
 | FR-10 | Dashboard: counts, recent jobs, quick links | ADM, DSP | architecture.md |
+| FR-11 | Forgot-password page validates email and directs users to an administrator until email delivery is implemented | All | api.md |
 
 ## Validation rules
 - Email: valid format; unique per Customer AND per Technician.
@@ -44,3 +45,5 @@ Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
 ## Out of scope
 - CANCELLED status (enum exists, no transition into it yet) — data-model.md.
 - Mobile client — web-only single app.
+- Password-reset email delivery with Resend, reset-token handling, and password update — future improvement.
+- Dark mode — future improvement.

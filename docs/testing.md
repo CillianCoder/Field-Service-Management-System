@@ -10,7 +10,8 @@
 - Invalid forms and duplicate email handling (Customer & Technician).
 - Role rules from UI and server side (cross-role access blocked).
 - Responsive layouts (mobile + desktop).
-- Reset password / auth error states where relevant.
+- Forgot-password required-email validation and deferred-delivery guidance.
+- Reset-link and password-update states when Resend delivery is implemented.
 
 ## Demo accounts (seed)
 ```

@@ -1,6 +1,7 @@
 "use client";
 
 import { Eye, EyeOff, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
@@ -150,6 +151,14 @@ export function LoginForm() {
             {fieldErrors.password}
           </p>
         ) : null}
+        <div className="mt-3 text-right">
+          <Link
+            className="text-accent hover:text-accent-hover text-sm font-semibold underline-offset-4 hover:underline"
+            href="/forgot-password"
+          >
+            Forgot password?
+          </Link>
+        </div>
       </div>
 
       <button
