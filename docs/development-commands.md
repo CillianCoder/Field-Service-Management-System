@@ -25,6 +25,9 @@ npm run dev
 DATABASE_URL=postgresql://<user>:<password>@<host>/<db>?sslmode=require
 BETTER_AUTH_SECRET=<long-random-string>
 BETTER_AUTH_URL=http://localhost:3000
+ADMIN_DEMO_PASSWORD=<admin-demo-password>
+DISPATCHER_DEMO_PASSWORD=<dispatcher-demo-password>
+TECHNICIAN_DEMO_PASSWORD=<technician-demo-password>
 ```
 
 Rules:
@@ -60,7 +63,8 @@ Demo accounts (seeded):
 - Admin: `admin@fieldflow.test`
 - Dispatcher: `dispatch@fieldflow.test`
 - Technician: `tech@fieldflow.test`
-- Password: Demo password (set via env)
+- Passwords: set separately with `ADMIN_DEMO_PASSWORD`,
+  `DISPATCHER_DEMO_PASSWORD`, and `TECHNICIAN_DEMO_PASSWORD`.
 
 ## Build & Development
 ```bash

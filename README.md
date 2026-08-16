@@ -17,7 +17,7 @@ technicians and tracking work from assignment through completion.
 2. Copy `.env.example` to `.env` and provide local database and auth values.
 3. Run `npm run db:generate`.
 4. Create and apply the first migration with `npm run db:migrate`.
-5. Set `DEMO_PASSWORD`, then run `npm run db:seed`.
+5. Set the three role-specific demo password variables, then run `npm run db:seed`.
 6. Start the application with `npm run dev`.
 
 The development server runs at `http://localhost:3000`.

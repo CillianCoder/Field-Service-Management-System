@@ -72,9 +72,9 @@ public/
 
 ## Demo credentials (must work after seed)
 ```
-Admin: admin@fieldflow.test / Demo password
-Dispatcher: dispatch@fieldflow.test / Demo password
-Technician: tech@fieldflow.test / Demo password
+Admin: admin@fieldflow.test / ADMIN_DEMO_PASSWORD
+Dispatcher: dispatch@fieldflow.test / DISPATCHER_DEMO_PASSWORD
+Technician: tech@fieldflow.test / TECHNICIAN_DEMO_PASSWORD
 ```
 
 <!-- BEGIN:nextjs-agent-rules -->

@@ -4,4 +4,4 @@ The Prisma schema contains the Better Auth tables and FieldFlow domain models. G
 
 Better Auth owns credential hashes in `Account.password`. FieldFlow extends `User` with the application `Role`; do not add a separate `User.passwordHash` field.
 
-The seed is idempotent and creates the documented demo users and credential accounts. Set `DATABASE_URL` and `DEMO_PASSWORD` before running `npm run db:seed`.
+The seed is idempotent and creates the documented demo users and credential accounts. Set `DATABASE_URL`, `ADMIN_DEMO_PASSWORD`, `DISPATCHER_DEMO_PASSWORD`, and `TECHNICIAN_DEMO_PASSWORD` before running `npm run db:seed`.

@@ -103,12 +103,13 @@ Idempotent seed with `upsert` so it can run repeatedly without duplicates.
 
 ```ts
 // prisma/seed.ts
-const passwordHash = await hashPassword(process.env.DEMO_PASSWORD!);
+const passwordHash = await hashPassword(process.env[demoUser.passwordEnv]!);
 // Upsert User and Account separately. Better Auth stores credential hashes in
 // Account.password, not User.passwordHash.
 ```
 
-Password hashing is handled by the auth library (never store plain text).
+Each role uses a separate demo password environment variable. Password hashing
+is handled by the auth library (never store plain text in the database).
 
 ## 6. Role-Aware Navigation
 
