@@ -100,6 +100,7 @@ model Technician {
 
 model WorkOrder {
   id              String              @id @default(cuid())
+  jobNumber       Int                 @unique @default(autoincrement())
   title           String
   description     String
   customerId      String

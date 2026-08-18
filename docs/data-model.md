@@ -92,6 +92,7 @@ enum TechStatus {
 ```prisma
 model WorkOrder {
   id              String        @id @default(cuid())
+  jobNumber       Int           @unique @default(autoincrement()) // public reference, displayed as WO-0001
   title           String
   description     String
   customerId      String
