@@ -30,18 +30,18 @@ const priorityLabels = {
 } as const;
 
 const priorityClasses = {
-  LOW: "border-slate-200 bg-slate-50 text-slate-700",
-  MEDIUM: "border-blue-200 bg-blue-50 text-blue-700",
-  HIGH: "border-orange-200 bg-orange-50 text-orange-700",
-  URGENT: "border-red-200 bg-red-50 text-red-700",
+  LOW: "priority-low",
+  MEDIUM: "priority-medium",
+  HIGH: "priority-high",
+  URGENT: "priority-urgent",
 } as const;
 
 const statusClasses = {
-  OPEN: "border-slate-200 bg-slate-50 text-slate-700",
-  ASSIGNED: "border-slate-200 bg-slate-50 text-slate-700",
-  IN_PROGRESS: "border-blue-200 bg-blue-50 text-blue-700",
-  COMPLETED: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  CANCELLED: "border-red-200 bg-red-50 text-red-700",
+  OPEN: "status-open",
+  ASSIGNED: "status-assigned",
+  IN_PROGRESS: "status-in-progress",
+  COMPLETED: "status-completed",
+  CANCELLED: "status-cancelled",
 } as const;
 
 export default async function MyJobsPage({ searchParams }: MyJobsPageProps) {

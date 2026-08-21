@@ -10,6 +10,7 @@ import {
   MapPin,
   Phone,
 } from "lucide-react";
+import Link from "next/link";
 import { useActionState } from "react";
 
 import { initialJobActionState } from "@/features/work-orders/action-state";
@@ -118,6 +119,12 @@ export function JobCard({
         </a>
       </div>
       <p className="text-muted mt-5 line-clamp-2 text-sm">{job.description}</p>
+      <Link
+        className="text-accent hover:text-accent-hover mt-4 inline-block text-sm font-semibold underline-offset-4 hover:underline"
+        href={`/work-orders/${job.id}`}
+      >
+        View details
+      </Link>
 
       {canComplete ? (
         <div className="border-border mt-5 grid gap-5 border-t pt-5 sm:grid-cols-2">

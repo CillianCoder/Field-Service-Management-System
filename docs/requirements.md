@@ -17,7 +17,7 @@ Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
 | FR-07 | Completions require notes; completedAt + completedById recorded | TECH | data-model.md |
 | FR-08 | Every status change logged with user + timestamp | system | WorkOrderActivity |
 | FR-09 | Duplicate email rejected (Customer + Technician) | system | data-model.md |
-| FR-10 | Dashboard: counts, recent jobs, quick links | ADM, DSP | architecture.md |
+| FR-10 | Dashboard: counts, recent jobs, technician status, quick links, and cancellation workflow | ADM, DSP | architecture.md |
 | FR-11 | Forgot-password page validates email and directs users to an administrator until email delivery is implemented | All | api.md |
 
 ## Validation rules
@@ -42,9 +42,10 @@ Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
 - **My Jobs**: technician sees active/in-progress/completed counts, URL-backed search/filter/sort controls, public `WO-0001` references, customer contact details, job history, and contextual start/complete actions.
 - **Roles**: TECH blocked from `/users` and other technicians' jobs (server-side, not just UI).
 - **Dashboard**: counts correct against seeded data.
+- **Cancellation**: Admin/Dispatcher can cancel only `OPEN` or `ASSIGNED` jobs with a reason; the action is audited and cancelled jobs are excluded from active and overdue counts.
 
 ## Out of scope
-- CANCELLED status (enum exists, no transition into it yet) — data-model.md.
+- Cancellation after a job reaches `IN_PROGRESS` — requires a separate operational policy.
 - Mobile client — web-only single app.
 - Password-reset email delivery with Resend, reset-token handling, and password update — future improvement.
 - Dark mode — future improvement.

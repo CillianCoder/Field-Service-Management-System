@@ -25,7 +25,7 @@ model.
 | `/technicians` | Admin, Dispatcher | Technician CRUD |
 | `/work-orders` | Admin, Dispatcher | List, filter, manage |
 | `/work-orders/new` | Admin, Dispatcher | Create work order |
-| `/work-orders/[id]` | Role-based | View/update single job |
+| `/work-orders/[id]` | Admin, Dispatcher, Technician | View a job; technicians can view assigned jobs only |
 | `/my-jobs` | Technician | Assigned jobs only |
 
 ## Key actions
@@ -40,6 +40,7 @@ model.
 | View jobs | Technician | own only |
 | Start work | all (own) | requires assigned technician |
 | Complete job | all (own) | completion notes required |
+| Cancel work order | Admin, Dispatcher | only `OPEN` or `ASSIGNED`; reason required; terminal `CANCELLED` state |
 
 The `/my-jobs` page reads URL parameters for `search`, `status`, `priority`, and
 `sort`. The server resolves the technician from the authenticated user ID before
@@ -54,6 +55,13 @@ Technician job actions are implemented as a server action. `START` transitions
 the same transaction as the work-order update. The My Jobs query also returns
 the assigned customer's name, address, phone, email, and chronological activity
 records for the technician's job-history display.
+
+The work-order detail cancellation server action authorizes Admin or Dispatcher roles,
+validates a non-empty reason, allows cancellation only from `OPEN` or `ASSIGNED`,
+updates the work order and writes the `STATUS_CHANGED` activity in one
+transaction. Cancelled work orders remain searchable and visible as history but
+are excluded from active workload and overdue counts. Technicians cannot invoke
+the cancellation action.
 
 ## Error responses
 - Invalid form → field-level Zod messages.

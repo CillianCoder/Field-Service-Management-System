@@ -126,6 +126,11 @@ enum WOStatus {
 }
 ```
 
+`CANCELLED` is a terminal status. The cancellation reason is stored in the
+corresponding `WorkOrderActivity.notes` value, together with the cancelling
+user, timestamp, previous status, and new status. No separate cancellation
+columns are required for the current workflow.
+
 ### WorkOrderActivity (audit trail)
 ```prisma
 model WorkOrderActivity {

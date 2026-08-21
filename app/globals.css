@@ -65,3 +65,37 @@ textarea {
   background: #dbeafe;
   color: var(--foreground);
 }
+
+.priority-low,
+.status-open,
+.status-assigned {
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--foreground);
+}
+
+.priority-medium,
+.status-in-progress {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.priority-high {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #a16207;
+}
+
+.priority-urgent,
+.status-cancelled {
+  border-color: var(--error-border);
+  background: var(--error-subtle);
+  color: var(--error-text);
+}
+
+.status-completed {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+  color: #047857;
+}

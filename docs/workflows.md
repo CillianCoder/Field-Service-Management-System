@@ -2,13 +2,15 @@
 
 ## Job lifecycle
 ```
-OPEN → ASSIGNED → IN_PROGRESS → COMPLETED (or CANCELLED)
+OPEN → ASSIGNED → IN_PROGRESS → COMPLETED
+	└──────────────→ CANCELLED
 ```
 1. **Create** — Dispatcher/Admin creates WorkOrder (customer required).
 2. **Assign** — Dispatcher/Admin assigns a technician → ASSIGNED.
 3. **Start** — Technician starts own job → IN_PROGRESS.
 4. **Update** — Technician adds progress notes.
 5. **Complete** — Technician completes with notes → COMPLETED (completedAt + completedById recorded).
+6. **Cancel** — Admin or Dispatcher cancels an `OPEN` or `ASSIGNED` job with a required reason → CANCELLED.
 
 Every status update writes a WorkOrderActivity: action, fromValue, toValue, userId, timestamp.
 
@@ -38,6 +40,10 @@ Every status update writes a WorkOrderActivity: action, fromValue, toValue, user
 - Job cannot complete without completion notes.
 - Completion notes required for COMPLETED status.
 - Every status update records user + timestamp.
+- Only Admin and Dispatcher can cancel work orders.
+- Cancellation requires a reason and creates a `WorkOrderActivity` audit record.
+- `CANCELLED` is terminal; cancelled work orders cannot be started, completed, or reopened.
+- Cancelled work orders are excluded from active technician workload and overdue counts.
 - Duplicate email prevention (Customer & Technician).
 
 ## Authorization & security rules
