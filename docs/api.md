@@ -20,6 +20,7 @@ model.
 | `/login` | All | Sign in |
 | `/forgot-password` | All | Validate a recovery email and show administrator guidance |
 | `/dashboard` | Admin, Dispatcher | Operations summary |
+| `/customers` | Admin, Dispatcher | Search and manage customers |
 | `/users` | Admin | Manage accounts & roles |
 | `/customers` | Admin, Dispatcher | Customer CRUD |
 | `/technicians` | Admin, Dispatcher | Technician CRUD |

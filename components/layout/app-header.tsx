@@ -13,7 +13,7 @@ export function AppHeader() {
           </span>
           <span>FieldFlow</span>
         </Link>
-        <span className="text-muted text-sm">Project scaffold</span>
+        <span className="text-muted text-sm">Operations</span>
       </div>
     </header>
   );

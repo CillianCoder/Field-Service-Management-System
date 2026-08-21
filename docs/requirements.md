@@ -9,7 +9,7 @@ Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
 | ID | Requirement | Role | Detail |
 |----|-------------|------|--------|
 | FR-01 | Sign in with email/password; session persists across refresh | All | Better Auth |
-| FR-02 | CRUD customers with search | ADM, DSP | data-model.md |
+| FR-02 | CRUD customers with search | ADM, DSP | `/customers`; data-model.md |
 | FR-03 | CRUD technicians linked to User accounts | ADM, DSP | data-model.md |
 | FR-04 | Create work order (customer required) | DSP, ADM | workflows.md |
 | FR-05 | Assign work order to a technician | DSP, ADM | workflows.md |
