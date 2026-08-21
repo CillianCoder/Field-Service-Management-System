@@ -13,7 +13,7 @@ Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
 | FR-03 | CRUD technicians linked to User accounts | ADM, DSP | data-model.md |
 | FR-04 | Create work order (customer required) | DSP, ADM | workflows.md |
 | FR-05 | Assign work order to a technician | DSP, ADM | workflows.md |
-| FR-06 | Technician starts/completes own jobs only | TECH | server-enforced |
+| FR-06 | Technician views, starts, updates, and completes own jobs only | TECH | `/my-jobs`, server-enforced |
 | FR-07 | Completions require notes; completedAt + completedById recorded | TECH | data-model.md |
 | FR-08 | Every status change logged with user + timestamp | system | WorkOrderActivity |
 | FR-09 | Duplicate email rejected (Customer + Technician) | system | data-model.md |
@@ -39,6 +39,7 @@ Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
 - **Auth**: wrong password → visible error, no stack trace leak.
 - **Customers/Techs**: invalid form shows errors; duplicate email blocked; empty state shown when no rows.
 - **Work Orders**: DSP assigns → TECH sees job in `/my-jobs`; unassigned job cannot start.
+- **My Jobs**: technician sees active/in-progress/completed counts, URL-backed search/filter/sort controls, public `WO-0001` references, customer contact details, job history, and contextual start/complete actions.
 - **Roles**: TECH blocked from `/users` and other technicians' jobs (server-side, not just UI).
 - **Dashboard**: counts correct against seeded data.
 

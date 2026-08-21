@@ -20,12 +20,23 @@ export type WorkOrderModel = runtime.Types.Result.DefaultSelection<Prisma.$WorkO
 
 export type AggregateWorkOrder = {
   _count: WorkOrderCountAggregateOutputType | null
+  _avg: WorkOrderAvgAggregateOutputType | null
+  _sum: WorkOrderSumAggregateOutputType | null
   _min: WorkOrderMinAggregateOutputType | null
   _max: WorkOrderMaxAggregateOutputType | null
 }
 
+export type WorkOrderAvgAggregateOutputType = {
+  jobNumber: number | null
+}
+
+export type WorkOrderSumAggregateOutputType = {
+  jobNumber: number | null
+}
+
 export type WorkOrderMinAggregateOutputType = {
   id: string | null
+  jobNumber: number | null
   title: string | null
   description: string | null
   customerId: string | null
@@ -42,6 +53,7 @@ export type WorkOrderMinAggregateOutputType = {
 
 export type WorkOrderMaxAggregateOutputType = {
   id: string | null
+  jobNumber: number | null
   title: string | null
   description: string | null
   customerId: string | null
@@ -58,6 +70,7 @@ export type WorkOrderMaxAggregateOutputType = {
 
 export type WorkOrderCountAggregateOutputType = {
   id: number
+  jobNumber: number
   title: number
   description: number
   customerId: number
@@ -74,8 +87,17 @@ export type WorkOrderCountAggregateOutputType = {
 }
 
 
+export type WorkOrderAvgAggregateInputType = {
+  jobNumber?: true
+}
+
+export type WorkOrderSumAggregateInputType = {
+  jobNumber?: true
+}
+
 export type WorkOrderMinAggregateInputType = {
   id?: true
+  jobNumber?: true
   title?: true
   description?: true
   customerId?: true
@@ -92,6 +114,7 @@ export type WorkOrderMinAggregateInputType = {
 
 export type WorkOrderMaxAggregateInputType = {
   id?: true
+  jobNumber?: true
   title?: true
   description?: true
   customerId?: true
@@ -108,6 +131,7 @@ export type WorkOrderMaxAggregateInputType = {
 
 export type WorkOrderCountAggregateInputType = {
   id?: true
+  jobNumber?: true
   title?: true
   description?: true
   customerId?: true
@@ -161,6 +185,18 @@ export type WorkOrderAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inte
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: WorkOrderAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: WorkOrderSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: WorkOrderMinAggregateInputType
@@ -191,12 +227,15 @@ export type WorkOrderGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   _count?: WorkOrderCountAggregateInputType | true
+  _avg?: WorkOrderAvgAggregateInputType
+  _sum?: WorkOrderSumAggregateInputType
   _min?: WorkOrderMinAggregateInputType
   _max?: WorkOrderMaxAggregateInputType
 }
 
 export type WorkOrderGroupByOutputType = {
   id: string
+  jobNumber: number
   title: string
   description: string
   customerId: string
@@ -210,6 +249,8 @@ export type WorkOrderGroupByOutputType = {
   completedAt: Date | null
   completedById: string | null
   _count: WorkOrderCountAggregateOutputType | null
+  _avg: WorkOrderAvgAggregateOutputType | null
+  _sum: WorkOrderSumAggregateOutputType | null
   _min: WorkOrderMinAggregateOutputType | null
   _max: WorkOrderMaxAggregateOutputType | null
 }
@@ -234,6 +275,7 @@ export type WorkOrderWhereInput = {
   OR?: Prisma.WorkOrderWhereInput[]
   NOT?: Prisma.WorkOrderWhereInput | Prisma.WorkOrderWhereInput[]
   id?: Prisma.StringFilter<"WorkOrder"> | string
+  jobNumber?: Prisma.IntFilter<"WorkOrder"> | number
   title?: Prisma.StringFilter<"WorkOrder"> | string
   description?: Prisma.StringFilter<"WorkOrder"> | string
   customerId?: Prisma.StringFilter<"WorkOrder"> | string
@@ -253,6 +295,7 @@ export type WorkOrderWhereInput = {
 
 export type WorkOrderOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  jobNumber?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
@@ -272,6 +315,7 @@ export type WorkOrderOrderByWithRelationInput = {
 
 export type WorkOrderWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  jobNumber?: number
   AND?: Prisma.WorkOrderWhereInput | Prisma.WorkOrderWhereInput[]
   OR?: Prisma.WorkOrderWhereInput[]
   NOT?: Prisma.WorkOrderWhereInput | Prisma.WorkOrderWhereInput[]
@@ -290,10 +334,11 @@ export type WorkOrderWhereUniqueInput = Prisma.AtLeast<{
   customer?: Prisma.XOR<Prisma.CustomerScalarRelationFilter, Prisma.CustomerWhereInput>
   technician?: Prisma.XOR<Prisma.TechnicianNullableScalarRelationFilter, Prisma.TechnicianWhereInput> | null
   activities?: Prisma.WorkOrderActivityListRelationFilter
-}, "id">
+}, "id" | "jobNumber">
 
 export type WorkOrderOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  jobNumber?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
@@ -307,8 +352,10 @@ export type WorkOrderOrderByWithAggregationInput = {
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedById?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.WorkOrderCountOrderByAggregateInput
+  _avg?: Prisma.WorkOrderAvgOrderByAggregateInput
   _max?: Prisma.WorkOrderMaxOrderByAggregateInput
   _min?: Prisma.WorkOrderMinOrderByAggregateInput
+  _sum?: Prisma.WorkOrderSumOrderByAggregateInput
 }
 
 export type WorkOrderScalarWhereWithAggregatesInput = {
@@ -316,6 +363,7 @@ export type WorkOrderScalarWhereWithAggregatesInput = {
   OR?: Prisma.WorkOrderScalarWhereWithAggregatesInput[]
   NOT?: Prisma.WorkOrderScalarWhereWithAggregatesInput | Prisma.WorkOrderScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"WorkOrder"> | string
+  jobNumber?: Prisma.IntWithAggregatesFilter<"WorkOrder"> | number
   title?: Prisma.StringWithAggregatesFilter<"WorkOrder"> | string
   description?: Prisma.StringWithAggregatesFilter<"WorkOrder"> | string
   customerId?: Prisma.StringWithAggregatesFilter<"WorkOrder"> | string
@@ -332,6 +380,7 @@ export type WorkOrderScalarWhereWithAggregatesInput = {
 
 export type WorkOrderCreateInput = {
   id?: string
+  jobNumber?: number
   title: string
   description: string
   priority?: $Enums.Priority
@@ -349,6 +398,7 @@ export type WorkOrderCreateInput = {
 
 export type WorkOrderUncheckedCreateInput = {
   id?: string
+  jobNumber?: number
   title: string
   description: string
   customerId: string
@@ -383,6 +433,7 @@ export type WorkOrderUpdateInput = {
 
 export type WorkOrderUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -400,6 +451,7 @@ export type WorkOrderUncheckedUpdateInput = {
 
 export type WorkOrderCreateManyInput = {
   id?: string
+  jobNumber?: number
   title: string
   description: string
   customerId: string
@@ -430,6 +482,7 @@ export type WorkOrderUpdateManyMutationInput = {
 
 export type WorkOrderUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -456,6 +509,7 @@ export type WorkOrderOrderByRelationAggregateInput = {
 
 export type WorkOrderCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  jobNumber?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
@@ -470,8 +524,13 @@ export type WorkOrderCountOrderByAggregateInput = {
   completedById?: Prisma.SortOrder
 }
 
+export type WorkOrderAvgOrderByAggregateInput = {
+  jobNumber?: Prisma.SortOrder
+}
+
 export type WorkOrderMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  jobNumber?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
@@ -488,6 +547,7 @@ export type WorkOrderMaxOrderByAggregateInput = {
 
 export type WorkOrderMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  jobNumber?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
@@ -500,6 +560,10 @@ export type WorkOrderMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   completedById?: Prisma.SortOrder
+}
+
+export type WorkOrderSumOrderByAggregateInput = {
+  jobNumber?: Prisma.SortOrder
 }
 
 export type WorkOrderScalarRelationFilter = {
@@ -599,6 +663,14 @@ export type EnumWOStatusFieldUpdateOperationsInput = {
   set?: $Enums.WOStatus
 }
 
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type WorkOrderCreateNestedOneWithoutActivitiesInput = {
   create?: Prisma.XOR<Prisma.WorkOrderCreateWithoutActivitiesInput, Prisma.WorkOrderUncheckedCreateWithoutActivitiesInput>
   connectOrCreate?: Prisma.WorkOrderCreateOrConnectWithoutActivitiesInput
@@ -615,6 +687,7 @@ export type WorkOrderUpdateOneRequiredWithoutActivitiesNestedInput = {
 
 export type WorkOrderCreateWithoutCustomerInput = {
   id?: string
+  jobNumber?: number
   title: string
   description: string
   priority?: $Enums.Priority
@@ -631,6 +704,7 @@ export type WorkOrderCreateWithoutCustomerInput = {
 
 export type WorkOrderUncheckedCreateWithoutCustomerInput = {
   id?: string
+  jobNumber?: number
   title: string
   description: string
   technicianId?: string | null
@@ -676,6 +750,7 @@ export type WorkOrderScalarWhereInput = {
   OR?: Prisma.WorkOrderScalarWhereInput[]
   NOT?: Prisma.WorkOrderScalarWhereInput | Prisma.WorkOrderScalarWhereInput[]
   id?: Prisma.StringFilter<"WorkOrder"> | string
+  jobNumber?: Prisma.IntFilter<"WorkOrder"> | number
   title?: Prisma.StringFilter<"WorkOrder"> | string
   description?: Prisma.StringFilter<"WorkOrder"> | string
   customerId?: Prisma.StringFilter<"WorkOrder"> | string
@@ -692,6 +767,7 @@ export type WorkOrderScalarWhereInput = {
 
 export type WorkOrderCreateWithoutTechnicianInput = {
   id?: string
+  jobNumber?: number
   title: string
   description: string
   priority?: $Enums.Priority
@@ -708,6 +784,7 @@ export type WorkOrderCreateWithoutTechnicianInput = {
 
 export type WorkOrderUncheckedCreateWithoutTechnicianInput = {
   id?: string
+  jobNumber?: number
   title: string
   description: string
   customerId: string
@@ -750,6 +827,7 @@ export type WorkOrderUpdateManyWithWhereWithoutTechnicianInput = {
 
 export type WorkOrderCreateWithoutActivitiesInput = {
   id?: string
+  jobNumber?: number
   title: string
   description: string
   priority?: $Enums.Priority
@@ -766,6 +844,7 @@ export type WorkOrderCreateWithoutActivitiesInput = {
 
 export type WorkOrderUncheckedCreateWithoutActivitiesInput = {
   id?: string
+  jobNumber?: number
   title: string
   description: string
   customerId: string
@@ -814,6 +893,7 @@ export type WorkOrderUpdateWithoutActivitiesInput = {
 
 export type WorkOrderUncheckedUpdateWithoutActivitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -830,6 +910,7 @@ export type WorkOrderUncheckedUpdateWithoutActivitiesInput = {
 
 export type WorkOrderCreateManyCustomerInput = {
   id?: string
+  jobNumber?: number
   title: string
   description: string
   technicianId?: string | null
@@ -861,6 +942,7 @@ export type WorkOrderUpdateWithoutCustomerInput = {
 
 export type WorkOrderUncheckedUpdateWithoutCustomerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   technicianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -877,6 +959,7 @@ export type WorkOrderUncheckedUpdateWithoutCustomerInput = {
 
 export type WorkOrderUncheckedUpdateManyWithoutCustomerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   technicianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -892,6 +975,7 @@ export type WorkOrderUncheckedUpdateManyWithoutCustomerInput = {
 
 export type WorkOrderCreateManyTechnicianInput = {
   id?: string
+  jobNumber?: number
   title: string
   description: string
   customerId: string
@@ -923,6 +1007,7 @@ export type WorkOrderUpdateWithoutTechnicianInput = {
 
 export type WorkOrderUncheckedUpdateWithoutTechnicianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -939,6 +1024,7 @@ export type WorkOrderUncheckedUpdateWithoutTechnicianInput = {
 
 export type WorkOrderUncheckedUpdateManyWithoutTechnicianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -985,6 +1071,7 @@ export type WorkOrderCountOutputTypeCountActivitiesArgs<ExtArgs extends runtime.
 
 export type WorkOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  jobNumber?: boolean
   title?: boolean
   description?: boolean
   customerId?: boolean
@@ -1005,6 +1092,7 @@ export type WorkOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type WorkOrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  jobNumber?: boolean
   title?: boolean
   description?: boolean
   customerId?: boolean
@@ -1023,6 +1111,7 @@ export type WorkOrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
 
 export type WorkOrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  jobNumber?: boolean
   title?: boolean
   description?: boolean
   customerId?: boolean
@@ -1041,6 +1130,7 @@ export type WorkOrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
 
 export type WorkOrderSelectScalar = {
   id?: boolean
+  jobNumber?: boolean
   title?: boolean
   description?: boolean
   customerId?: boolean
@@ -1055,7 +1145,7 @@ export type WorkOrderSelectScalar = {
   completedById?: boolean
 }
 
-export type WorkOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "customerId" | "technicianId" | "priority" | "status" | "scheduledDate" | "completionNotes" | "createdAt" | "updatedAt" | "completedAt" | "completedById", ExtArgs["result"]["workOrder"]>
+export type WorkOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobNumber" | "title" | "description" | "customerId" | "technicianId" | "priority" | "status" | "scheduledDate" | "completionNotes" | "createdAt" | "updatedAt" | "completedAt" | "completedById", ExtArgs["result"]["workOrder"]>
 export type WorkOrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
   technician?: boolean | Prisma.WorkOrder$technicianArgs<ExtArgs>
@@ -1080,6 +1170,7 @@ export type $WorkOrderPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    jobNumber: number
     title: string
     description: string
     customerId: string
@@ -1519,6 +1610,7 @@ export interface Prisma__WorkOrderClient<T, Null = never, ExtArgs extends runtim
  */
 export interface WorkOrderFieldRefs {
   readonly id: Prisma.FieldRef<"WorkOrder", 'String'>
+  readonly jobNumber: Prisma.FieldRef<"WorkOrder", 'Int'>
   readonly title: Prisma.FieldRef<"WorkOrder", 'String'>
   readonly description: Prisma.FieldRef<"WorkOrder", 'String'>
   readonly customerId: Prisma.FieldRef<"WorkOrder", 'String'>

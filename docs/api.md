@@ -41,6 +41,20 @@ model.
 | Start work | all (own) | requires assigned technician |
 | Complete job | all (own) | completion notes required |
 
+The `/my-jobs` page reads URL parameters for `search`, `status`, `priority`, and
+`sort`. The server resolves the technician from the authenticated user ID before
+querying work orders, so client-provided technician IDs are never trusted.
+Work orders have an internal CUID and a separate unique numeric `jobNumber`.
+The UI displays the public number as `WO-0001`; server actions continue using
+the internal work-order ID.
+
+Technician job actions are implemented as a server action. `START` transitions
+`ASSIGNED` to `IN_PROGRESS`; `COMPLETE` transitions `IN_PROGRESS` to
+`COMPLETED` and requires notes. Each action writes a `WorkOrderActivity` row in
+the same transaction as the work-order update. The My Jobs query also returns
+the assigned customer's name, address, phone, email, and chronological activity
+records for the technician's job-history display.
+
 ## Error responses
 - Invalid form → field-level Zod messages.
 - Unauthorized → redirect to login (or role-appropriate page).

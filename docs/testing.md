@@ -11,6 +11,7 @@
 - Role rules from UI and server side (cross-role access blocked).
 - Responsive layouts (mobile + desktop).
 - Forgot-password required-email validation and deferred-delivery guidance.
+- Technician My Jobs counts, own-job filtering, responsive cards, and start/complete actions.
 - Reset-link and password-update states when Resend delivery is implemented.
 
 ## Demo accounts (seed)
@@ -28,3 +29,5 @@ Technician: tech@fieldflow.test / TECHNICIAN_DEMO_PASSWORD
 
 ## Test data
 - Seed via `prisma/seed.ts`: 3 demo users (one per role), sample customers, technicians, and work orders in multiple statuses.
+- The seed is idempotent and was run twice successfully after adding technician domain data.
+- Current automated browser coverage remains focused on authentication and forgot-password flows; technician-specific Playwright coverage is the next test increment.

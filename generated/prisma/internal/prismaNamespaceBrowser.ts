@@ -166,6 +166,7 @@ export type TechnicianScalarFieldEnum = (typeof TechnicianScalarFieldEnum)[keyof
 
 export const WorkOrderScalarFieldEnum = {
   id: 'id',
+  jobNumber: 'jobNumber',
   title: 'title',
   description: 'description',
   customerId: 'customerId',
