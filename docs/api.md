@@ -9,10 +9,11 @@ Next.js App Router — no separate REST API. Data access via **Server Actions / 
 - **Errors**: user-facing messages; never expose stack traces.
 - **Data flow**: react hook form (optional) → server action → Zod → Prisma.
 
-Better Auth is mounted at `/api/auth/[...all]`. Public sign-up is disabled;
-administrator-managed account creation will be added with the user-management
-feature. Credential password hashes are stored in Better Auth's `Account`
-model.
+Better Auth is mounted at `/api/auth/[...all]`. Public sign-up is disabled.
+Admin and Dispatcher users can provision Technician accounts through the
+protected `/technicians` server action. The User, credential Account, and
+Technician profile are created atomically, and Better Auth hashes the initial
+password before it is stored in `Account.password`.
 
 ## Route map
 | Route | Main User | Purpose |
@@ -23,7 +24,7 @@ model.
 | `/customers` | Admin, Dispatcher | Search and manage customers |
 | `/users` | Admin | Manage accounts & roles |
 | `/customers` | Admin, Dispatcher | Customer CRUD |
-| `/technicians` | Admin, Dispatcher | Technician CRUD |
+| `/technicians` | Admin, Dispatcher | Search, filter, create, and edit technicians |
 | `/work-orders` | Admin, Dispatcher | List, filter, manage |
 | `/work-orders/new` | Admin, Dispatcher | Create work order |
 | `/work-orders/[id]` | Admin, Dispatcher, Technician | View a job; technicians can view assigned jobs only |
@@ -34,7 +35,9 @@ model.
 |--------|-------|-------------|
 | Manage users/roles | Admin only | 403 otherwise |
 | Create customers | Admin, Dispatcher | duplicate email blocked |
-| Create technicians | Admin, Dispatcher | userId link required |
+| Create technicians | Admin, Dispatcher | User, credential Account, and Technician created atomically |
+| Edit technicians | Admin, Dispatcher | User and Technician name/email remain synchronized |
+| Set technician Offline | Admin, Dispatcher | active-job conflicts require explicit confirmation |
 | Create WOs | Admin, Dispatcher | customer, title, desc, scheduled date required |
 | Assign technician | Admin, Dispatcher | sets ASSIGNED |
 | View WOs | Admin, Dispatcher | all |
@@ -53,9 +56,21 @@ the internal work-order ID.
 Technician job actions are implemented as a server action. `START` transitions
 `ASSIGNED` to `IN_PROGRESS`; `COMPLETE` transitions `IN_PROGRESS` to
 `COMPLETED` and requires notes. Each action writes a `WorkOrderActivity` row in
-the same transaction as the work-order update. The My Jobs query also returns
+the same transaction as the work-order update. Starting work also sets the
+Technician to `BUSY`. Completing the final in-progress job returns a non-Offline
+Technician to `AVAILABLE`. The My Jobs query also returns
 the assigned customer's name, address, phone, email, and chronological activity
 records for the technician's job-history display.
+
+Setting a Technician to `OFFLINE` does not unassign existing work. When active
+assigned or in-progress jobs exist, the edit form shows their counts and the
+server action requires explicit confirmation. Offline technicians must be
+excluded from future assignment options.
+
+The `/technicians` directory uses URL-backed `search`, `status`, and `page`
+parameters. Pagination links preserve active filters, filter submissions reset
+to the first page, and browser Back/Forward restores the previous directory
+state.
 
 The work-order detail cancellation server action authorizes Admin or Dispatcher roles,
 validates a non-empty reason, allows cancellation only from `OPEN` or `ASSIGNED`,

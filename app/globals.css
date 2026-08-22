@@ -99,3 +99,21 @@ textarea {
   background: #ecfdf5;
   color: #047857;
 }
+
+.technician-status-available {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.technician-status-busy {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.technician-status-offline {
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--muted);
+}

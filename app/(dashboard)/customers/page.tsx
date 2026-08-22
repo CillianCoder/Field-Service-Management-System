@@ -1,4 +1,5 @@
-import { Plus, Search } from "lucide-react";
+import { ArrowLeft, Plus, Search } from "lucide-react";
+import Link from "next/link";
 import { Suspense } from "react";
 
 import { AppHeader } from "@/components/layout/app-header";
@@ -98,6 +99,13 @@ async function CustomersContent({ searchParams }: CustomersPageProps) {
               Search, review, and manage customer records.
             </p>
           </div>
+          <Link
+            className="border-border text-foreground hover:bg-surface inline-flex min-h-11 shrink-0 items-center justify-center gap-2 border px-4 text-sm font-semibold"
+            href="/dashboard"
+          >
+            <ArrowLeft aria-hidden="true" className="size-4" />
+            Back to dashboard
+          </Link>
         </div>
 
         <section className="border-border bg-panel mt-8 border p-5">

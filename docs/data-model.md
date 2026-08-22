@@ -88,6 +88,13 @@ enum TechStatus {
 }
 ```
 
+Technician status is operational availability, not account lifecycle. `BUSY`
+is set when the technician starts work, and the final in-progress completion
+returns a non-Offline technician to `AVAILABLE`. `OFFLINE` temporarily prevents
+new assignments; it does not delete the account or unassign existing jobs.
+Name and email are duplicated for operational queries and are updated on both
+User and Technician in one transaction.
+
 ### WorkOrder (main feature)
 ```prisma
 model WorkOrder {
@@ -162,6 +169,8 @@ model WorkOrderActivity {
 - Seed via `npx prisma db seed` (`prisma/seed.ts`).
 - Passwords are hashed by Better Auth and stored in `Account.password`; do not
   add a `User.passwordHash` field.
+- Technician provisioning creates User, credential Account, and Technician in
+  one transaction so a failed write cannot leave a partial login account.
 
 ## Statuses & state machine
 Job flow (server-enforced):
