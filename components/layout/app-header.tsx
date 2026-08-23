@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { SignOutButton } from "@/components/layout/sign-out-button";
+
 export function AppHeader() {
   return (
     <header className="border-border bg-panel border-b">
@@ -13,7 +15,10 @@ export function AppHeader() {
           </span>
           <span>FieldFlow</span>
         </Link>
-        <span className="text-muted text-sm">Operations</span>
+        <div className="flex items-center gap-3">
+          <span className="text-muted hidden text-sm sm:block">Operations</span>
+          <SignOutButton />
+        </div>
       </div>
     </header>
   );

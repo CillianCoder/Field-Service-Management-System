@@ -70,6 +70,9 @@ export function TechnicianForm({
   const showOfflineWarning = Boolean(
     technician && selectedStatus === "OFFLINE" && activeJobs > 0,
   );
+  const showBusyInfo = Boolean(
+    technician && selectedStatus === "BUSY" && activeJobs > 0,
+  );
 
   return (
     <form action={formAction} className="space-y-5" noValidate>
@@ -238,6 +241,20 @@ export function TechnicianForm({
             />
             I understand and want to set this technician offline.
           </label>
+        </div>
+      ) : null}
+
+      {showBusyInfo ? (
+        <div className="border-border bg-surface p-4">
+          <p className="text-foreground text-sm font-semibold">
+            This technician already has active work
+          </p>
+          <p className="text-muted mt-1 text-sm">
+            There are {technician?.assignedJobs} assigned and{" "}
+            {technician?.inProgressJobs} in-progress job
+            {activeJobs === 1 ? "" : "s"}. Setting Busy will not change these
+            existing assignments.
+          </p>
         </div>
       ) : null}
 

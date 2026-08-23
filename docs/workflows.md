@@ -45,6 +45,10 @@ Every status update writes a WorkOrderActivity: action, fromValue, toValue, user
 - `CANCELLED` is terminal; cancelled work orders cannot be started, completed, or reopened.
 - Cancelled work orders are excluded from active technician workload and overdue counts.
 - Duplicate email prevention (Customer & Technician).
+- Technician status edits:
+	- `AVAILABLE` can be selected without confirmation; existing jobs are unchanged.
+	- `BUSY` can be selected without confirmation; active workload is shown for clarity and existing jobs are unchanged.
+	- `OFFLINE` requires confirmation when assigned or in-progress jobs exist; existing jobs remain assigned and new assignments are prevented.
 
 ## Authorization & security rules
 - Every protected server action must authorize.

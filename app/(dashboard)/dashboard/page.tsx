@@ -8,6 +8,7 @@ import {
   Wrench,
 } from "lucide-react";
 
+import { AppHeader } from "@/components/layout/app-header";
 import {
   getDashboardData,
   parseDashboardFilters,
@@ -130,8 +131,9 @@ export default async function DashboardPage({
   ];
 
   return (
-    <main className="bg-background min-h-screen px-5 py-8 sm:px-8">
-      <div className="mx-auto max-w-7xl">
+    <main className="bg-background min-h-screen">
+      <AppHeader />
+      <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-accent text-sm font-semibold">
