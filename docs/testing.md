@@ -12,6 +12,10 @@
 - Responsive layouts (mobile + desktop).
 - Forgot-password required-email validation and deferred-delivery guidance.
 - Technician My Jobs counts, own-job filtering, responsive cards, and start/complete actions.
+- Technician management role protection, predefined skills, URL-backed search/status filters and pagination, duplicate email handling, and Offline conflict confirmation.
+- Technician status synchronization: start sets Busy; final in-progress completion restores Available unless explicitly Offline.
+- Work Order management: Admin/Dispatcher directory authorization, search/filter/sort state, filter-preserving pagination, creation with and without assignment, and server-side rejection of Offline technician assignment.
+- Work Order directory refresh after cancellation and detail-page navigation back to the directory.
 - Reset-link and password-update states when Resend delivery is implemented.
 
 ## Demo accounts (seed)
@@ -30,4 +34,4 @@ Technician: tech@fieldflow.test / TECHNICIAN_DEMO_PASSWORD
 ## Test data
 - Seed via `prisma/seed.ts`: 3 demo users (one per role), sample customers, technicians, and work orders in multiple statuses.
 - The seed is idempotent and was run twice successfully after adding technician domain data.
-- Current automated browser coverage remains focused on authentication and forgot-password flows; technician-specific Playwright coverage is the next test increment.
+- Current automated browser coverage remains focused on authentication and forgot-password flows. Technician management tests require seeded authenticated fixtures and remain a pending test increment.

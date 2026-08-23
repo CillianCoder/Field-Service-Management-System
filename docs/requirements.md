@@ -9,16 +9,19 @@ Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
 | ID | Requirement | Role | Detail |
 |----|-------------|------|--------|
 | FR-01 | Sign in with email/password; session persists across refresh | All | Better Auth |
-| FR-02 | CRUD customers with search | ADM, DSP | data-model.md |
-| FR-03 | CRUD technicians linked to User accounts | ADM, DSP | data-model.md |
+| FR-02 | CRUD customers with search | ADM, DSP | `/customers`; data-model.md |
+| FR-03 | Search, filter, create, and edit technicians linked to login accounts | ADM, DSP | `/technicians`; data-model.md |
 | FR-04 | Create work order (customer required) | DSP, ADM | workflows.md |
 | FR-05 | Assign work order to a technician | DSP, ADM | workflows.md |
 | FR-06 | Technician views, starts, updates, and completes own jobs only | TECH | `/my-jobs`, server-enforced |
 | FR-07 | Completions require notes; completedAt + completedById recorded | TECH | data-model.md |
 | FR-08 | Every status change logged with user + timestamp | system | WorkOrderActivity |
 | FR-09 | Duplicate email rejected (Customer + Technician) | system | data-model.md |
-| FR-10 | Dashboard: counts, recent jobs, quick links | ADM, DSP | architecture.md |
+| FR-10 | Dashboard: counts, recent jobs, technician status, quick links, and cancellation workflow | ADM, DSP | architecture.md |
 | FR-11 | Forgot-password page validates email and directs users to an administrator until email delivery is implemented | All | api.md |
+| FR-12 | Starting work sets Technician Busy; final in-progress completion returns a non-Offline Technician to Available | TECH, system | workflows.md |
+| FR-13 | Setting a Technician Offline with active jobs requires explicit conflict confirmation and preserves assignments | ADM, DSP | `/technicians`; api.md |
+| FR-14 | Admin searches users and manages roles without removing technician profiles | ADM | `/users`; api.md |
 
 ## Validation rules
 - Email: valid format; unique per Customer AND per Technician.
@@ -38,13 +41,16 @@ Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
 ## Acceptance criteria
 - **Auth**: wrong password → visible error, no stack trace leak.
 - **Customers/Techs**: invalid form shows errors; duplicate email blocked; empty state shown when no rows.
+- **Technicians**: predefined skills only; search/status filters work; Offline conflicts show assigned and in-progress counts and require confirmation.
 - **Work Orders**: DSP assigns → TECH sees job in `/my-jobs`; unassigned job cannot start.
 - **My Jobs**: technician sees active/in-progress/completed counts, URL-backed search/filter/sort controls, public `WO-0001` references, customer contact details, job history, and contextual start/complete actions.
 - **Roles**: TECH blocked from `/users` and other technicians' jobs (server-side, not just UI).
 - **Dashboard**: counts correct against seeded data.
+- **Cancellation**: Admin/Dispatcher can cancel only `OPEN` or `ASSIGNED` jobs with a reason; the action is audited and cancelled jobs are excluded from active and overdue counts.
 
 ## Out of scope
-- CANCELLED status (enum exists, no transition into it yet) — data-model.md.
+- Cancellation after a job reaches `IN_PROGRESS` — requires a separate operational policy.
 - Mobile client — web-only single app.
 - Password-reset email delivery with Resend, reset-token handling, and password update — future improvement.
+- Technician deactivation/removal, initial-password delivery, and forced first-login password change — future improvements.
 - Dark mode — future improvement.

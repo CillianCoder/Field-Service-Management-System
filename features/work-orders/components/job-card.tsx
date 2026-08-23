@@ -10,6 +10,7 @@ import {
   MapPin,
   Phone,
 } from "lucide-react";
+import Link from "next/link";
 import { useActionState } from "react";
 
 import { initialJobActionState } from "@/features/work-orders/action-state";
@@ -64,7 +65,7 @@ export function JobCard({
   const canComplete = job.status === "IN_PROGRESS";
 
   return (
-    <article className="border-border bg-panel border p-5">
+    <article className="border-border bg-panel border p-5 transition-shadow hover:shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-muted text-xs font-semibold uppercase">
@@ -73,7 +74,7 @@ export function JobCard({
               {formatJobReference(job.jobNumber)}
             </span>
           </p>
-          <h3 className="text-foreground mt-2 text-lg font-semibold">
+          <h3 className="text-foreground mt-2 text-base font-semibold sm:text-lg">
             {job.title}
           </h3>
         </div>
@@ -94,7 +95,7 @@ export function JobCard({
           />
           <span>{job.customer.name}</span>
         </p>
-        <p className="flex items-start gap-2">
+        <p className="text-foreground flex items-start gap-2 font-medium">
           <CalendarDays aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
           <span>{formatDate(job.scheduledDate)}</span>
         </p>
@@ -118,6 +119,12 @@ export function JobCard({
         </a>
       </div>
       <p className="text-muted mt-5 line-clamp-2 text-sm">{job.description}</p>
+      <Link
+        className="text-accent hover:text-accent-hover mt-4 inline-block text-sm font-semibold underline-offset-4 hover:underline"
+        href={`/work-orders/${job.id}`}
+      >
+        View details
+      </Link>
 
       {canComplete ? (
         <div className="border-border mt-5 grid gap-5 border-t pt-5 sm:grid-cols-2">
@@ -221,7 +228,7 @@ export function JobCard({
               <li className="relative pb-4 last:pb-0" key={activity.id}>
                 <span
                   aria-hidden="true"
-                  className="border-panel bg-muted absolute top-1.5 -left-[1.3125rem] size-2.5 rounded-full border-2"
+                  className="border-panel bg-muted absolute top-1.5 -left-5 size-2.5 rounded-full border-2"
                 />
                 <p className="text-foreground text-sm font-medium capitalize">
                   {formatActivityLabel(

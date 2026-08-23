@@ -33,7 +33,7 @@ export async function updateMyJob(
 
   const technician = await prisma.technician.findUnique({
     where: { userId: session.user.id },
-    select: { id: true },
+    select: { id: true, status: true },
   });
 
   if (!technician) {
@@ -92,6 +92,28 @@ export async function updateMyJob(
               : {}),
           },
         });
+
+        if (nextStatus === "IN_PROGRESS") {
+          await transaction.technician.update({
+            where: { id: technician.id },
+            data: { status: "BUSY" },
+          });
+        } else {
+          const otherInProgressJobs = await transaction.workOrder.count({
+            where: {
+              technicianId: technician.id,
+              status: "IN_PROGRESS",
+              id: { not: workOrder.id },
+            },
+          });
+
+          if (otherInProgressJobs === 0 && technician.status !== "OFFLINE") {
+            await transaction.technician.update({
+              where: { id: technician.id },
+              data: { status: "AVAILABLE" },
+            });
+          }
+        }
       }
 
       await transaction.workOrderActivity.create({
@@ -111,5 +133,7 @@ export async function updateMyJob(
   }
 
   revalidatePath("/my-jobs");
+  revalidatePath("/technicians");
+  revalidatePath("/dashboard");
   return initialJobActionState;
 }

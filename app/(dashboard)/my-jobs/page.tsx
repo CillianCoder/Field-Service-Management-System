@@ -1,7 +1,7 @@
 import { ClipboardList, Search, Wrench } from "lucide-react";
 import Link from "next/link";
 
-import { SignOutButton } from "@/components/layout/sign-out-button";
+import { AppHeader } from "@/components/layout/app-header";
 import { JobCard } from "@/features/work-orders/components/job-card";
 import { LivePageContext } from "@/features/work-orders/components/live-page-context";
 import {
@@ -30,18 +30,18 @@ const priorityLabels = {
 } as const;
 
 const priorityClasses = {
-  LOW: "border-slate-200 bg-slate-50 text-slate-700",
-  MEDIUM: "border-blue-200 bg-blue-50 text-blue-700",
-  HIGH: "border-orange-200 bg-orange-50 text-orange-700",
-  URGENT: "border-red-200 bg-red-50 text-red-700",
+  LOW: "priority-low",
+  MEDIUM: "priority-medium",
+  HIGH: "priority-high",
+  URGENT: "priority-urgent",
 } as const;
 
 const statusClasses = {
-  OPEN: "border-slate-200 bg-slate-50 text-slate-700",
-  ASSIGNED: "border-slate-200 bg-slate-50 text-slate-700",
-  IN_PROGRESS: "border-blue-200 bg-blue-50 text-blue-700",
-  COMPLETED: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  CANCELLED: "border-red-200 bg-red-50 text-red-700",
+  OPEN: "status-open",
+  ASSIGNED: "status-assigned",
+  IN_PROGRESS: "status-in-progress",
+  COMPLETED: "status-completed",
+  CANCELLED: "status-cancelled",
 } as const;
 
 export default async function MyJobsPage({ searchParams }: MyJobsPageProps) {
@@ -54,30 +54,15 @@ export default async function MyJobsPage({ searchParams }: MyJobsPageProps) {
 
   return (
     <main className="bg-background min-h-screen">
-      <header className="border-border bg-panel border-b">
-        <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-          <Link className="flex items-center gap-3 font-semibold" href="/">
-            <span
-              aria-hidden="true"
-              className="bg-accent grid size-8 place-items-center text-sm font-bold text-white"
-            >
-              F
-            </span>
-            <span>FieldFlow</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <span className="text-muted hidden text-sm md:block">
-              Technician workspace
-            </span>
-            <SignOutButton />
-          </div>
-        </div>
-      </header>
+      <AppHeader role="TECHNICIAN" />
 
-      <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <div className="mx-auto max-w-7xl px-4 py-8 pt-24 sm:px-6 lg:ml-64 lg:px-8">
+        <div className="border-border flex flex-col justify-between gap-4 border-b pb-6 sm:flex-row sm:items-end">
           <div>
-            <h1 className="text-foreground mt-2 text-3xl font-semibold tracking-tight">
+            <p className="text-muted text-xs font-semibold tracking-wider uppercase">
+              Work
+            </p>
+            <h1 className="text-foreground mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
               My jobs
             </h1>
           </div>
@@ -91,23 +76,23 @@ export default async function MyJobsPage({ searchParams }: MyJobsPageProps) {
 
         <section
           aria-label="Job summary"
-          className="mt-8 grid gap-4 sm:grid-cols-3"
+          className="mt-6 grid gap-3 sm:grid-cols-3"
         >
           {[
             { label: "Active jobs", value: data.counts.active },
             { label: "In progress", value: data.counts.inProgress },
             { label: "Completed", value: data.counts.completed },
           ].map((item) => (
-            <div className="border-border bg-panel border p-5" key={item.label}>
+            <div className="border-border bg-panel border p-4" key={item.label}>
               <p className="text-muted text-sm">{item.label}</p>
-              <p className="text-foreground mt-2 text-3xl font-semibold">
+              <p className="text-foreground mt-2 font-mono text-2xl font-semibold tabular-nums">
                 {item.value}
               </p>
             </div>
           ))}
         </section>
 
-        <form className="border-border bg-panel mt-8 border p-4" method="get">
+        <form className="border-border bg-panel mt-6 border p-4" method="get">
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_160px_160px_180px_auto] lg:items-end">
             <label className="text-foreground text-sm font-medium">
               Search jobs
@@ -181,9 +166,9 @@ export default async function MyJobsPage({ searchParams }: MyJobsPageProps) {
           ) : null}
         </form>
 
-        <section aria-label="Assigned jobs" className="mt-8">
+        <section aria-label="Assigned jobs" className="mt-6">
           <div className="flex items-center justify-between gap-4">
-            <h2 className="text-foreground text-xl font-semibold">
+            <h2 className="text-foreground text-base font-semibold">
               Your work orders
             </h2>
             <span className="text-muted text-sm">
