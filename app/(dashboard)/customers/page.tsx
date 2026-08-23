@@ -1,5 +1,4 @@
-import { ArrowLeft, Plus, Search } from "lucide-react";
-import Link from "next/link";
+import { Plus, Search } from "lucide-react";
 import { Suspense } from "react";
 
 import { AppHeader } from "@/components/layout/app-header";
@@ -17,6 +16,11 @@ export const metadata: Metadata = {
 type CustomersPageProps = Readonly<{
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }>;
+
+type CustomersContentProps = CustomersPageProps &
+  Readonly<{
+    role: "ADMIN" | "DISPATCHER";
+  }>;
 
 function firstValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : (value ?? "");
@@ -78,37 +82,30 @@ function CustomerTable({
   ) : null;
 }
 
-async function CustomersContent({ searchParams }: CustomersPageProps) {
+async function CustomersContent({ searchParams, role }: CustomersContentProps) {
   const params = await searchParams;
   const search = firstValue(params.search);
   const customers = await getCustomers(search);
 
   return (
     <main className="bg-background min-h-screen">
-      <AppHeader />
-      <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <AppHeader role={role} />
+      <div className="mx-auto max-w-7xl px-4 py-8 pt-24 sm:px-6 lg:ml-64 lg:px-8">
+        <div className="border-border flex flex-col gap-5 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-accent text-sm font-semibold">
-              Admin / Dispatcher
+            <p className="text-muted text-xs font-semibold tracking-wider uppercase">
+              Management
             </p>
-            <h1 className="text-foreground mt-2 text-3xl font-semibold tracking-tight">
+            <h1 className="text-foreground mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
               Customers
             </h1>
             <p className="text-muted mt-2 text-sm">
               Search, review, and manage customer records.
             </p>
           </div>
-          <Link
-            className="border-border text-foreground hover:bg-surface inline-flex min-h-11 shrink-0 items-center justify-center gap-2 border px-4 text-sm font-semibold"
-            href="/dashboard"
-          >
-            <ArrowLeft aria-hidden="true" className="size-4" />
-            Back to dashboard
-          </Link>
         </div>
 
-        <section className="border-border bg-panel mt-8 border p-5">
+        <section className="border-border bg-panel mt-6 border p-4 sm:p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <form className="grid gap-3 lg:flex lg:items-end" method="get">
               <label className="text-foreground text-sm font-medium">
@@ -146,7 +143,7 @@ async function CustomersContent({ searchParams }: CustomersPageProps) {
             </div>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-5">
             {customers.length > 0 ? (
               <CustomerTable customers={customers} />
             ) : (
@@ -166,7 +163,7 @@ async function CustomersContent({ searchParams }: CustomersPageProps) {
           </div>
         </section>
 
-        <section className="border-border bg-panel mt-8 border p-5">
+        <section className="border-border bg-panel mt-6 border p-4 sm:p-5">
           <div className="flex items-center gap-3">
             <Plus aria-hidden="true" className="size-4" />
             <h2 className="text-foreground text-lg font-semibold">
@@ -183,12 +180,15 @@ async function CustomersContent({ searchParams }: CustomersPageProps) {
 }
 
 export default async function CustomersPage(props: CustomersPageProps) {
-  await requireRole(["ADMIN", "DISPATCHER"]);
+  const session = await requireRole(["ADMIN", "DISPATCHER"]);
   return (
     <Suspense
-      fallback={<div className="text-muted p-8">Loading customers...</div>}
+      fallback={<div className="text-muted p-8">Loading customers…</div>}
     >
-      <CustomersContent {...props} />
+      <CustomersContent
+        {...props}
+        role={session.user.role === "ADMIN" ? "ADMIN" : "DISPATCHER"}
+      />
     </Suspense>
   );
 }

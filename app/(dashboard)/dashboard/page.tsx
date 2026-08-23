@@ -14,6 +14,7 @@ import {
   parseDashboardFilters,
 } from "@/features/dashboard/queries";
 import { requireRole } from "@/lib/auth-session";
+import { isRole } from "@/lib/auth-roles";
 
 type DashboardPageProps = Readonly<{
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -96,6 +97,7 @@ export default async function DashboardPage({
   const session = await requireRole(["ADMIN", "DISPATCHER"]);
   const filters = parseDashboardFilters(await searchParams);
   const data = await getDashboardData(filters);
+  const role = isRole(session.user.role) ? session.user.role : "DISPATCHER";
   const canManageUsers = session.user.role === "ADMIN";
   const kpis = [
     {
@@ -132,32 +134,33 @@ export default async function DashboardPage({
 
   return (
     <main className="bg-background min-h-screen">
-      <AppHeader />
-      <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <AppHeader role={role} />
+      <div className="mx-auto max-w-7xl px-4 py-8 pt-24 sm:px-6 lg:ml-64 lg:px-8">
+        <div className="border-border flex flex-col justify-between gap-5 border-b pb-6 sm:flex-row sm:items-end">
           <div>
-            <p className="text-accent text-sm font-semibold">
-              FieldFlow operations
+            <p className="text-muted text-xs font-semibold tracking-wider uppercase">
+              Operations overview
             </p>
-            <h1 className="text-foreground mt-2 text-3xl font-semibold tracking-tight">
+            <h1 className="text-foreground mt-2 text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
               Dashboard
             </h1>
-            <p className="text-muted mt-2 text-sm">
+            <p className="text-muted mt-2 text-sm text-pretty">
               Welcome, {session.user.name}. Here is the current service
               workload.
             </p>
           </div>
-          <span className="text-muted flex items-center gap-2 text-sm">
+          <Link
+            className="bg-accent hover:bg-accent-hover inline-flex min-h-11 items-center justify-center gap-2 px-4 text-sm font-semibold text-white transition-colors"
+            href="/work-orders/new"
+          >
             <Wrench aria-hidden="true" className="size-4" />
-            {session.user.role === "ADMIN"
-              ? "Admin workspace"
-              : "Dispatcher workspace"}
-          </span>
+            New work order
+          </Link>
         </div>
 
         <section
           aria-label="Work order summary"
-          className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-5"
+          className="mt-6 grid gap-3 sm:grid-cols-3 lg:grid-cols-5"
         >
           {kpis.map((kpi) => {
             const Icon = kpi.icon;
@@ -171,15 +174,26 @@ export default async function DashboardPage({
                 : dashboardHref(filters, { status: kpi.href, page: "1" });
             return (
               <Link
-                className="border-border bg-panel hover:border-accent border p-4 transition-colors"
+                className={`border-border bg-panel hover:border-accent group border p-4 transition-colors ${kpi.label === "Overdue" && kpi.value > 0 ? "border-l-4 border-l-amber-500" : ""}`}
                 href={href}
                 key={kpi.label}
               >
                 <div className="text-muted flex items-center justify-between text-sm">
-                  <span>{kpi.label}</span>
-                  <Icon aria-hidden="true" className="size-4" />
+                  <span
+                    className={
+                      kpi.label === "Overdue" && kpi.value > 0
+                        ? "text-amber-700"
+                        : ""
+                    }
+                  >
+                    {kpi.label}
+                  </span>
+                  <Icon
+                    aria-hidden="true"
+                    className="size-4 transition-transform group-hover:translate-x-0.5"
+                  />
                 </div>
-                <p className="text-foreground mt-3 text-3xl font-semibold">
+                <p className="text-foreground mt-3 font-mono text-3xl font-semibold tabular-nums">
                   {kpi.value}
                 </p>
               </Link>
@@ -187,17 +201,17 @@ export default async function DashboardPage({
           })}
         </section>
 
-        <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+        <div className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
           <section className="border-border bg-panel border p-4 sm:p-5">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="text-foreground text-lg font-semibold">
+              <h2 className="text-foreground text-base font-semibold">
                 Recent work orders
               </h2>
               <Link
-                className="text-accent text-sm font-semibold hover:underline"
-                href="/work-orders"
+                className="text-accent text-sm font-semibold underline-offset-4 hover:underline"
+                href="/work-orders/new"
               >
-                View all
+                New work order
               </Link>
             </div>
             <form
@@ -275,7 +289,10 @@ export default async function DashboardPage({
                   </thead>
                   <tbody>
                     {data.recentWorkOrders.map((job) => (
-                      <tr className="text-foreground align-top" key={job.id}>
+                      <tr
+                        className="text-foreground hover:bg-surface/60 align-top transition-colors"
+                        key={job.id}
+                      >
                         <td className="border-border border-b px-3 py-4 pl-0 font-mono text-xs font-semibold">
                           {formatJobReference(job.jobNumber)}
                         </td>
@@ -323,7 +340,7 @@ export default async function DashboardPage({
               </span>
               <div className="flex gap-2">
                 <Link
-                  className="border-border border px-3 py-2 aria-disabled:pointer-events-none aria-disabled:opacity-50"
+                  className="border-border hover:bg-surface border px-3 py-2 text-xs font-semibold aria-disabled:pointer-events-none aria-disabled:opacity-50"
                   aria-disabled={data.pagination.page <= 1}
                   href={dashboardHref(filters, {
                     page: Math.max(1, data.pagination.page - 1).toString(),
@@ -335,7 +352,7 @@ export default async function DashboardPage({
                   Page {data.pagination.page} of {data.pagination.totalPages}
                 </span>
                 <Link
-                  className="border-border border px-3 py-2 aria-disabled:pointer-events-none aria-disabled:opacity-50"
+                  className="border-border hover:bg-surface border px-3 py-2 text-xs font-semibold aria-disabled:pointer-events-none aria-disabled:opacity-50"
                   aria-disabled={
                     data.pagination.page >= data.pagination.totalPages
                   }
@@ -355,7 +372,7 @@ export default async function DashboardPage({
           <aside className="space-y-6">
             <section className="border-border bg-panel border p-5">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-foreground text-lg font-semibold">
+                <h2 className="text-foreground text-base font-semibold">
                   Technician status
                 </h2>
                 <Link
@@ -381,7 +398,9 @@ export default async function DashboardPage({
                           {technician._count.workOrders === 1 ? "" : "s"}
                         </p>
                       </div>
-                      <span className="text-muted shrink-0 text-xs font-semibold">
+                      <span
+                        className={`technician-status-${technician.status.toLowerCase()} shrink-0 border px-2 py-1 text-xs font-semibold`}
+                      >
                         {technician.status[0] +
                           technician.status.slice(1).toLowerCase()}
                       </span>
@@ -394,34 +413,38 @@ export default async function DashboardPage({
             </section>
 
             <section className="border-border bg-panel border p-5">
-              <h2 className="text-foreground text-lg font-semibold">
+              <h2 className="text-foreground text-base font-semibold">
                 Quick links
               </h2>
               <div className="mt-4 grid gap-2">
                 <Link
-                  className="bg-accent px-3 py-3 text-sm font-semibold text-white"
+                  className="bg-accent hover:bg-accent-hover flex min-h-11 items-center justify-between px-3 py-3 text-sm font-semibold text-white transition-colors"
                   href="/work-orders/new"
                 >
-                  + New work order
+                  <span>New work order</span>
+                  <span aria-hidden="true">→</span>
                 </Link>
                 <Link
-                  className="border-border text-foreground border px-3 py-3 text-sm font-semibold"
+                  className="border-border text-foreground hover:bg-surface flex min-h-11 items-center justify-between border px-3 py-3 text-sm font-semibold transition-colors"
                   href="/customers"
                 >
-                  + Customer
+                  <span>Add customer</span>
+                  <span aria-hidden="true">→</span>
                 </Link>
                 <Link
-                  className="border-border text-foreground border px-3 py-3 text-sm font-semibold"
+                  className="border-border text-foreground hover:bg-surface flex min-h-11 items-center justify-between border px-3 py-3 text-sm font-semibold transition-colors"
                   href="/technicians"
                 >
-                  + Technician
+                  <span>Add technician</span>
+                  <span aria-hidden="true">→</span>
                 </Link>
                 {canManageUsers ? (
                   <Link
-                    className="border-border text-foreground border px-3 py-3 text-sm font-semibold"
+                    className="border-border text-foreground hover:bg-surface flex min-h-11 items-center justify-between border px-3 py-3 text-sm font-semibold transition-colors"
                     href="/users"
                   >
-                    + User
+                    <span>Manage users</span>
+                    <span aria-hidden="true">→</span>
                   </Link>
                 ) : null}
               </div>

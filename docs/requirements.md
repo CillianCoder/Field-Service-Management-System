@@ -21,6 +21,7 @@ Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
 | FR-11 | Forgot-password page validates email and directs users to an administrator until email delivery is implemented | All | api.md |
 | FR-12 | Starting work sets Technician Busy; final in-progress completion returns a non-Offline Technician to Available | TECH, system | workflows.md |
 | FR-13 | Setting a Technician Offline with active jobs requires explicit conflict confirmation and preserves assignments | ADM, DSP | `/technicians`; api.md |
+| FR-14 | Admin searches users and manages roles without removing technician profiles | ADM | `/users`; api.md |
 
 ## Validation rules
 - Email: valid format; unique per Customer AND per Technician.

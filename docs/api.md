@@ -34,6 +34,8 @@ password before it is stored in `Account.password`.
 | Action | Roles | Server rule |
 |--------|-------|-------------|
 | Manage users/roles | Admin only | 403 otherwise |
+| Search users | Admin only | searches account name and email |
+| Edit user role | Admin only | self-demotion blocked; technician role requires a Technician profile |
 | Create customers | Admin, Dispatcher | duplicate email blocked |
 | Create technicians | Admin, Dispatcher | User, credential Account, and Technician created atomically |
 | Edit technicians | Admin, Dispatcher | User and Technician name/email remain synchronized |

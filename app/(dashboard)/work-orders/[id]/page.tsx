@@ -2,6 +2,7 @@ import { CalendarDays, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 
 import { CancelWorkOrderForm } from "@/features/dashboard/components/cancel-work-order-form";
+import { AppHeader } from "@/components/layout/app-header";
 import { getWorkOrderForViewer } from "@/features/work-orders/detail-query";
 import { requireRole } from "@/lib/auth-session";
 import { isRole } from "@/lib/auth-roles";
@@ -73,8 +74,9 @@ export default async function WorkOrderDetailPage({
     (workOrder.status === "OPEN" || workOrder.status === "ASSIGNED");
 
   return (
-    <main className="bg-background min-h-screen px-5 py-8 sm:px-8">
-      <div className="mx-auto max-w-5xl">
+    <main className="bg-background min-h-screen">
+      <AppHeader role={role} />
+      <div className="mx-auto max-w-5xl px-4 py-8 pt-24 sm:px-6 lg:ml-64 lg:px-8">
         <Link
           className="text-accent hover:text-accent-hover text-sm font-semibold underline-offset-4 hover:underline"
           href={session.user.role === "TECHNICIAN" ? "/my-jobs" : "/dashboard"}
@@ -82,12 +84,12 @@ export default async function WorkOrderDetailPage({
           Back to {session.user.role === "TECHNICIAN" ? "my jobs" : "dashboard"}
         </Link>
 
-        <header className="border-border mt-8 flex flex-col justify-between gap-4 border-b pb-6 sm:flex-row sm:items-start">
+        <header className="border-border mt-6 flex flex-col justify-between gap-4 border-b pb-6 sm:flex-row sm:items-start">
           <div>
             <p className="text-muted text-xs font-semibold tracking-wide uppercase">
               Job #{formatJobReference(workOrder.jobNumber)}
             </p>
-            <h1 className="text-foreground mt-2 text-3xl font-semibold tracking-tight">
+            <h1 className="text-foreground mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
               {workOrder.title}
             </h1>
           </div>
@@ -105,10 +107,10 @@ export default async function WorkOrderDetailPage({
           </div>
         </header>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
+        <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
           <div className="space-y-6">
             <section className="border-border bg-panel border p-5">
-              <h2 className="text-foreground text-lg font-semibold">
+              <h2 className="text-foreground text-base font-semibold">
                 Work order details
               </h2>
               <p className="text-muted mt-4 text-sm leading-6 whitespace-pre-wrap">
@@ -157,7 +159,7 @@ export default async function WorkOrderDetailPage({
 
             <section className="border-border bg-panel border p-5">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-foreground text-lg font-semibold">
+                <h2 className="text-foreground text-base font-semibold">
                   Activity history
                 </h2>
                 <span className="text-muted text-sm">
@@ -170,7 +172,7 @@ export default async function WorkOrderDetailPage({
                     <li className="relative pb-5 last:pb-0" key={activity.id}>
                       <span
                         aria-hidden="true"
-                        className="border-panel bg-muted absolute top-1.5 -left-[1.4375rem] size-2.5 rounded-full border-2"
+                        className="border-panel bg-muted absolute top-1.5 -left-5.75 size-2.5 rounded-full border-2"
                       />
                       <p className="text-foreground text-sm font-medium">
                         {formatActivityLabel(
@@ -200,7 +202,7 @@ export default async function WorkOrderDetailPage({
 
           <aside className="space-y-6">
             <section className="border-border bg-panel border p-5">
-              <h2 className="text-foreground text-lg font-semibold">
+              <h2 className="text-foreground text-base font-semibold">
                 Customer
               </h2>
               <div className="text-muted mt-4 space-y-3 text-sm">
@@ -232,7 +234,7 @@ export default async function WorkOrderDetailPage({
             </section>
 
             <section className="border-border bg-panel border p-5">
-              <h2 className="text-foreground text-lg font-semibold">
+              <h2 className="text-foreground text-base font-semibold">
                 Assigned technician
               </h2>
               {workOrder.technician ? (
@@ -252,7 +254,7 @@ export default async function WorkOrderDetailPage({
 
             {canCancel ? (
               <section className="border-border bg-panel border p-5">
-                <h2 className="text-foreground text-lg font-semibold">
+                <h2 className="text-foreground text-base font-semibold">
                   Actions
                 </h2>
                 <p className="text-muted mt-2 text-sm">

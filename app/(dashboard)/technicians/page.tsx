@@ -42,19 +42,23 @@ function technicianHref(
 export default async function TechniciansPage({
   searchParams,
 }: TechniciansPageProps) {
-  await requireRole(["ADMIN", "DISPATCHER"]);
+  const session = await requireRole(["ADMIN", "DISPATCHER"]);
   const filters = parseTechnicianFilters(await searchParams);
   const { technicians, pagination } = await getTechnicians(filters);
   const isFiltered = Boolean(filters.search || filters.status !== "ALL");
 
   return (
     <main className="bg-background min-h-screen">
-      <AppHeader />
-      <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <header className="border-border flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
+      <AppHeader
+        role={session.user.role === "ADMIN" ? "ADMIN" : "DISPATCHER"}
+      />
+      <div className="mx-auto w-full max-w-7xl px-4 py-8 pt-24 sm:px-6 lg:ml-64 lg:px-8">
+        <header className="border-border flex flex-col gap-5 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-accent text-sm font-semibold">Team management</p>
-            <h1 className="text-foreground mt-2 text-3xl font-semibold">
+            <p className="text-muted text-xs font-semibold tracking-wider uppercase">
+              Management
+            </p>
+            <h1 className="text-foreground mt-2 text-2xl font-semibold sm:text-3xl">
               Technicians
             </h1>
             <p className="text-muted mt-2 max-w-2xl text-sm leading-6">
@@ -73,7 +77,7 @@ export default async function TechniciansPage({
 
         <section
           aria-labelledby="create-technician-title"
-          className="border-border mt-8 border-b pb-8"
+          className="border-border mt-6 border-b pb-6"
         >
           <div className="mb-5">
             <h2
@@ -89,7 +93,7 @@ export default async function TechniciansPage({
           <TechnicianForm />
         </section>
 
-        <section aria-labelledby="technician-list-title" className="mt-8">
+        <section aria-labelledby="technician-list-title" className="mt-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <h2
@@ -151,7 +155,7 @@ export default async function TechniciansPage({
           </div>
 
           <div className="border-border mt-5 overflow-x-auto border">
-            <table className="w-full min-w-[960px] border-collapse text-left text-sm">
+            <table className="w-full min-w-240 border-collapse text-left text-sm">
               <thead className="bg-surface text-muted">
                 <tr>
                   <th className="px-4 py-3 font-semibold" scope="col">
@@ -186,7 +190,10 @@ export default async function TechniciansPage({
                     (job) => job.status === "IN_PROGRESS",
                   ).length;
                   return (
-                    <tr className="bg-panel align-top" key={technician.id}>
+                    <tr
+                      className="bg-panel hover:bg-surface/60 align-top transition-colors"
+                      key={technician.id}
+                    >
                       <td className="px-4 py-4">
                         <p className="text-foreground font-semibold">
                           {technician.name}
