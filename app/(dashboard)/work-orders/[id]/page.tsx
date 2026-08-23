@@ -79,9 +79,12 @@ export default async function WorkOrderDetailPage({
       <div className="mx-auto max-w-5xl px-4 py-8 pt-24 sm:px-6 lg:ml-64 lg:px-8">
         <Link
           className="text-accent hover:text-accent-hover text-sm font-semibold underline-offset-4 hover:underline"
-          href={session.user.role === "TECHNICIAN" ? "/my-jobs" : "/dashboard"}
+          href={
+            session.user.role === "TECHNICIAN" ? "/my-jobs" : "/work-orders"
+          }
         >
-          Back to {session.user.role === "TECHNICIAN" ? "my jobs" : "dashboard"}
+          Back to{" "}
+          {session.user.role === "TECHNICIAN" ? "my jobs" : "work orders"}
         </Link>
 
         <header className="border-border mt-6 flex flex-col justify-between gap-4 border-b pb-6 sm:flex-row sm:items-start">

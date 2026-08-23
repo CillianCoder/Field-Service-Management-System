@@ -48,6 +48,18 @@ password before it is stored in `Account.password`.
 | Complete job | all (own) | completion notes required |
 | Cancel work order | Admin, Dispatcher | only `OPEN` or `ASSIGNED`; reason required; terminal `CANCELLED` state |
 
+The Admin/Dispatcher `/work-orders` directory accepts URL parameters for
+`search`, `status`, `priority`, `sort`, and `page`. Search matches the public
+job number (`WO-0001`), title, customer, and technician. Pagination links
+preserve the active filters, while filter submissions reset to page one.
+
+The `/work-orders/new` form validates all fields server-side. A customer is
+required, a technician is optional, and a new assignment cannot target an
+`OFFLINE` technician. New unassigned jobs start as `OPEN`; jobs created with a
+valid non-offline technician start as `ASSIGNED`. Creation and its initial
+`STATUS_CHANGED` activity are committed in one transaction. The dashboard,
+work-order directory, and technician job list are revalidated after creation.
+
 The `/my-jobs` page reads URL parameters for `search`, `status`, `priority`, and
 `sort`. The server resolves the technician from the authenticated user ID before
 querying work orders, so client-provided technician IDs are never trusted.

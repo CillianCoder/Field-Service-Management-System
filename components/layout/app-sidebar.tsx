@@ -24,7 +24,10 @@ type AppSidebarProps = Readonly<{
 const groups = [
   {
     label: "Operations",
-    items: [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }],
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/work-orders", label: "Work orders", icon: ClipboardList },
+    ],
   },
   {
     label: "Management",

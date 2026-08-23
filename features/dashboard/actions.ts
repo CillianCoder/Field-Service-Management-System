@@ -78,6 +78,7 @@ export async function cancelWorkOrder(
   }
 
   revalidatePath("/dashboard");
+  revalidatePath("/work-orders");
   revalidatePath("/my-jobs");
   revalidatePath(`/work-orders/${workOrder.id}`);
   return {
