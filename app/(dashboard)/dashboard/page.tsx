@@ -182,7 +182,7 @@ export default async function DashboardPage({
                   <span
                     className={
                       kpi.label === "Overdue" && kpi.value > 0
-                        ? "text-amber-700"
+                        ? "text-warning-text"
                         : ""
                     }
                   >

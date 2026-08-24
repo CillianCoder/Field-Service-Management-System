@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { Role } from "@/generated/prisma/enums";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { SignOutButton } from "@/components/layout/sign-out-button";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 type AppHeaderProps = Readonly<{
   role?: Role;
@@ -42,6 +43,7 @@ export function AppHeader({ role = "DISPATCHER" }: AppHeaderProps) {
             </span>
           </div>
           <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle />
             <SignOutButton />
           </div>
         </div>

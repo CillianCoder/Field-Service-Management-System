@@ -71,7 +71,7 @@ export function AppSidebar({ role, mobileOpen, onClose }: AppSidebarProps) {
       {mobileOpen ? (
         <button
           aria-label="Close navigation"
-          className="fixed inset-0 z-40 bg-slate-950/25 lg:hidden"
+          className="bg-backdrop fixed inset-0 z-40 lg:hidden"
           onClick={onClose}
           type="button"
         />
@@ -119,7 +119,7 @@ export function AppSidebar({ role, mobileOpen, onClose }: AppSidebarProps) {
                   return (
                     <Link
                       aria-current={active ? "page" : undefined}
-                      className={`group flex min-h-10 items-center gap-3 px-3 text-sm font-medium transition-colors ${active ? "text-accent bg-blue-50" : "text-muted hover:bg-surface hover:text-foreground"}`}
+                      className={`group flex min-h-10 items-center gap-3 px-3 text-sm font-medium transition-colors ${active ? "text-accent bg-accent-subtle" : "text-muted hover:bg-surface hover:text-foreground"}`}
                       href={item.href}
                       key={item.href}
                       onClick={onClose}

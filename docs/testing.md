@@ -16,6 +16,7 @@
 - Technician status synchronization: start sets Busy; final in-progress completion restores Available unless explicitly Offline.
 - Work Order management: Admin/Dispatcher directory authorization, search/filter/sort state, filter-preserving pagination, creation with and without assignment, and server-side rejection of Offline technician assignment.
 - Work Order directory refresh after cancellation and detail-page navigation back to the directory.
+- Theme toggle accessibility, light/dark contrast, persisted preference after refresh, and system-theme fallback when no preference is saved.
 - Reset-link and password-update states when Resend delivery is implemented.
 
 ## Demo accounts (seed)

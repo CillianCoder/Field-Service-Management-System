@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 import { AppHeader } from "@/components/layout/app-header";
@@ -53,7 +52,7 @@ export default async function TechniciansPage({
         role={session.user.role === "ADMIN" ? "ADMIN" : "DISPATCHER"}
       />
       <div className="mx-auto w-full max-w-7xl px-4 py-8 pt-24 sm:px-6 lg:ml-64 lg:px-8">
-        <header className="border-border flex flex-col gap-5 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <header className="border-border border-b pb-6">
           <div>
             <p className="text-muted text-xs font-semibold tracking-wider uppercase">
               Management
@@ -66,13 +65,6 @@ export default async function TechniciansPage({
               skills, and manage assignment availability.
             </p>
           </div>
-          <Link
-            className="border-border text-foreground hover:bg-surface inline-flex min-h-11 shrink-0 items-center justify-center gap-2 border px-4 text-sm font-semibold"
-            href="/dashboard"
-          >
-            <ArrowLeft aria-hidden="true" className="size-4" />
-            Back to dashboard
-          </Link>
         </header>
 
         <section

@@ -37,6 +37,7 @@ Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
 | NFR-03 | Security: every protected server action authorizes | no cross-role fetch |
 | NFR-04 | Passwords hashed (auth lib), secrets in env only | audit |
 | NFR-05 | Empty states, loading, error states on every list page | UI review |
+| NFR-06 | Light and dark themes use accessible semantic colors and persist the user's preference | responsive UI review |
 
 ## Acceptance criteria
 - **Auth**: wrong password → visible error, no stack trace leak.
@@ -53,4 +54,3 @@ Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
 - Mobile client — web-only single app.
 - Password-reset email delivery with Resend, reset-token handling, and password update — future improvement.
 - Technician deactivation/removal, initial-password delivery, and forced first-login password change — future improvements.
-- Dark mode — future improvement.
