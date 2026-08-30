@@ -1,7 +1,8 @@
-import { Plus, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Suspense } from "react";
 
 import { AppHeader } from "@/components/layout/app-header";
+import FiltersFormClient from "@/components/dashboard/FiltersFormClient";
 import { CustomerForm } from "@/features/customers/components/customer-form";
 import { CustomerRowActions } from "@/features/customers/components/customer-row-actions";
 import { getCustomers } from "@/features/customers/queries";
@@ -86,6 +87,9 @@ async function CustomersContent({ searchParams, role }: CustomersContentProps) {
   const params = await searchParams;
   const search = firstValue(params.search);
   const customers = await getCustomers(search);
+  const created = Array.isArray(params.created)
+    ? params.created[0]
+    : params.created;
 
   return (
     <main className="bg-background min-h-screen">
@@ -103,41 +107,50 @@ async function CustomersContent({ searchParams, role }: CustomersContentProps) {
               Search, review, and manage customer records.
             </p>
           </div>
+          {created === "1" ? (
+            <p
+              className="bg-success-subtle border-success-border text-success-text mt-4 flex items-center gap-2 border px-4 py-3 text-sm font-medium"
+              role="status"
+            >
+              <span aria-hidden="true" className="text-lg leading-none">
+                ✓
+              </span>
+              Customer created successfully.
+            </p>
+          ) : null}
         </div>
+
+        <section
+          aria-labelledby="create-customer-title"
+          className="border-border mt-6 border-b pb-6"
+        >
+          <div className="mb-5">
+            <h2
+              className="text-foreground text-xl font-semibold"
+              id="create-customer-title"
+            >
+              Create customer
+            </h2>
+            <p className="text-muted mt-1 text-sm">
+              Add a customer record for service jobs.
+            </p>
+          </div>
+          <div className="max-w-3xl">
+            <CustomerForm key={created === "1" ? "created" : "fresh"} />
+          </div>
+        </section>
 
         <section className="border-border bg-panel mt-6 border p-4 sm:p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <form className="grid gap-3 lg:flex lg:items-end" method="get">
-              <label className="text-foreground text-sm font-medium">
-                Search customers
-                <span className="relative mt-2 block">
-                  <Search
-                    aria-hidden="true"
-                    className="text-muted pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
-                  />
-                  <input
-                    className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent h-11 w-full min-w-[280px] border px-3 pl-9 text-sm focus:outline-none"
-                    defaultValue={search}
-                    name="search"
-                    placeholder="Name, email, phone, or address"
-                  />
-                </span>
-              </label>
-              <button
-                className="bg-accent hover:bg-accent-hover h-11 px-5 text-sm font-semibold text-white transition-colors"
-                type="submit"
-              >
-                Filter
-              </button>
-              {search ? (
-                <a
-                  className="text-muted hover:text-foreground inline-flex h-11 items-center px-2 text-sm font-semibold hover:underline"
-                  href="/customers"
-                >
-                  Clear
-                </a>
-              ) : null}
-            </form>
+            <div className="flex min-w-0 items-center gap-3">
+              <Search
+                aria-hidden="true"
+                className="text-muted pointer-events-none size-4 shrink-0"
+              />
+              <div className="min-w-0 flex-1">
+                <FiltersFormClient action="/customers" initialSearch={search} />
+              </div>
+            </div>
             <div className="text-muted text-sm" aria-live="polite">
               {customers.length} result{customers.length === 1 ? "" : "s"}
             </div>
@@ -156,23 +169,13 @@ async function CustomersContent({ searchParams, role }: CustomersContentProps) {
                 <p className="text-muted mt-2 text-sm">
                   {search
                     ? "Try a different name, email, phone, or address."
-                    : "Create the first customer record below."}
+                    : "Create the first customer record using the form above."}
                 </p>
               </div>
             )}
           </div>
-        </section>
 
-        <section className="border-border bg-panel mt-6 border p-4 sm:p-5">
-          <div className="flex items-center gap-3">
-            <Plus aria-hidden="true" className="size-4" />
-            <h2 className="text-foreground text-lg font-semibold">
-              Create customer
-            </h2>
-          </div>
-          <div className="mt-5 max-w-3xl">
-            <CustomerForm />
-          </div>
+          {/* banner moved to header for visibility */}
         </section>
       </div>
     </main>

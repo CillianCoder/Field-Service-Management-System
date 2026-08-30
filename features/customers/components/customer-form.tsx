@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useState } from "react";
 
 import { saveCustomer } from "@/features/customers/actions";
 import {
@@ -21,6 +21,20 @@ type CustomerFormProps = Readonly<{
   onSuccess?: () => void;
 }>;
 
+type CustomerDraft = {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+};
+
+const EMPTY_DRAFT: CustomerDraft = {
+  name: "",
+  email: "",
+  phone: "",
+  address: "",
+};
+
 function submitLabel(customer?: CustomerFormProps["customer"]) {
   return customer ? "Update customer" : "Create customer";
 }
@@ -31,16 +45,36 @@ export function CustomerForm({
   onCancel,
   onSuccess,
 }: CustomerFormProps) {
+  const [draft, setDraft] = useState<CustomerDraft>(() =>
+    customer
+      ? {
+          name: customer.name,
+          email: customer.email,
+          phone: customer.phone,
+          address: customer.address,
+        }
+      : EMPTY_DRAFT,
+  );
   const [state, formAction, isPending] = useActionState<
     CustomerActionState,
     FormData
-  >(saveCustomer, initialCustomerActionState);
-
-  useEffect(() => {
-    if (state.success) {
+  >(async (previousState, formData) => {
+    const result = await saveCustomer(previousState, formData);
+    if (result.success) {
+      if (!customer) {
+        setDraft(EMPTY_DRAFT);
+      }
       onSuccess?.();
     }
-  }, [onSuccess, state.success]);
+    return result;
+  }, initialCustomerActionState);
+
+  function updateDraft<K extends keyof CustomerDraft>(
+    field: K,
+    value: CustomerDraft[K],
+  ) {
+    setDraft((previous) => ({ ...previous, [field]: value }));
+  }
 
   return (
     <form className="space-y-4" action={formAction} noValidate>
@@ -51,22 +85,24 @@ export function CustomerForm({
           Name
           <input
             className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-            defaultValue={customer?.name}
             name="name"
+            onChange={(event) => updateDraft("name", event.target.value)}
             placeholder="Northwind Office Park"
             required
             type="text"
+            value={draft.name}
           />
         </label>
         <label className="text-foreground text-sm font-medium">
           Email
           <input
             className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-            defaultValue={customer?.email}
             name="email"
+            onChange={(event) => updateDraft("email", event.target.value)}
             placeholder="customer@company.com"
             required
             type="email"
+            value={draft.email}
           />
         </label>
       </div>
@@ -76,22 +112,24 @@ export function CustomerForm({
           Phone
           <input
             className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-            defaultValue={customer?.phone}
             name="phone"
+            onChange={(event) => updateDraft("phone", event.target.value)}
             placeholder="+1 555 010 3001"
             required
             type="tel"
+            value={draft.phone}
           />
         </label>
         <label className="text-foreground text-sm font-medium">
           Address
           <input
             className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-            defaultValue={customer?.address}
             name="address"
+            onChange={(event) => updateDraft("address", event.target.value)}
             placeholder="1200 Market Street, Springfield"
             required
             type="text"
+            value={draft.address}
           />
         </label>
       </div>
@@ -99,11 +137,6 @@ export function CustomerForm({
       {state.error ? (
         <p className="text-error-text text-sm" role="alert">
           {state.error}
-        </p>
-      ) : null}
-      {state.success ? (
-        <p className="text-muted text-sm" role="status">
-          {state.success}
         </p>
       ) : null}
 
@@ -115,7 +148,7 @@ export function CustomerForm({
         >
           {submitLabelOverride ?? submitLabel(customer)}
         </button>
-        {customer && onCancel ? (
+        {onCancel ? (
           <button
             className="border-border text-foreground hover:bg-surface h-11 border px-5 text-sm font-semibold transition-colors"
             onClick={onCancel}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AppHeader } from "@/components/layout/app-header";
+import FiltersFormClient from "@/components/dashboard/FiltersFormClient";
 import { TechnicianForm } from "@/features/technicians/components/technician-form";
 import { TechnicianRowActions } from "@/features/technicians/components/technician-row-actions";
 import {
@@ -42,9 +43,13 @@ export default async function TechniciansPage({
   searchParams,
 }: TechniciansPageProps) {
   const session = await requireRole(["ADMIN", "DISPATCHER"]);
-  const filters = parseTechnicianFilters(await searchParams);
+  const params = await searchParams;
+  const filters = parseTechnicianFilters(params);
   const { technicians, pagination } = await getTechnicians(filters);
   const isFiltered = Boolean(filters.search || filters.status !== "ALL");
+  const created = Array.isArray(params.created)
+    ? params.created[0]
+    : params.created;
 
   return (
     <main className="bg-background min-h-screen">
@@ -65,6 +70,17 @@ export default async function TechniciansPage({
               skills, and manage assignment availability.
             </p>
           </div>
+          {created === "1" ? (
+            <p
+              className="bg-success-subtle border-success-border text-success-text mt-4 flex items-center gap-2 border px-4 py-3 text-sm font-medium"
+              role="status"
+            >
+              <span aria-hidden="true" className="text-lg leading-none">
+                ✓
+              </span>
+              Technician account created successfully.
+            </p>
+          ) : null}
         </header>
 
         <section
@@ -82,7 +98,7 @@ export default async function TechniciansPage({
               The initial password is hashed and never stored as plain text.
             </p>
           </div>
-          <TechnicianForm />
+          <TechnicianForm key={created === "1" ? "created" : "fresh"} />
         </section>
 
         <section aria-labelledby="technician-list-title" className="mt-6">
@@ -99,51 +115,18 @@ export default async function TechniciansPage({
                 {pagination.total === 1 ? "" : "s"} found
               </p>
             </div>
-            <form
-              className="grid gap-3 sm:grid-cols-[minmax(220px,1fr)_180px_auto]"
-              method="get"
-            >
-              <label className="sr-only" htmlFor="technician-search">
-                Search technicians
-              </label>
-              <input
-                className="border-input bg-panel placeholder:text-muted focus:border-accent h-11 border px-3 text-sm focus:outline-none"
-                defaultValue={filters.search}
-                id="technician-search"
-                name="search"
-                placeholder="Search name, email, phone"
-              />
-              <label className="sr-only" htmlFor="technician-status">
-                Filter by status
-              </label>
-              <select
-                className="border-input bg-panel focus:border-accent h-11 border px-3 text-sm focus:outline-none"
-                defaultValue={filters.status}
-                id="technician-status"
-                name="status"
-              >
-                <option value="ALL">All statuses</option>
-                <option value="AVAILABLE">Available</option>
-                <option value="BUSY">Busy</option>
-                <option value="OFFLINE">Offline</option>
-              </select>
-              <div className="flex gap-2">
-                <button
-                  className="bg-foreground h-11 px-4 text-sm font-semibold text-white hover:opacity-90"
-                  type="submit"
-                >
-                  Apply
-                </button>
-                {isFiltered ? (
-                  <Link
-                    className="border-border text-foreground hover:bg-surface inline-flex h-11 items-center border px-4 text-sm font-semibold"
-                    href="/technicians"
-                  >
-                    Clear
-                  </Link>
-                ) : null}
-              </div>
-            </form>
+            <FiltersFormClient
+              action="/technicians"
+              initialSearch={filters.search}
+              initialStatus={filters.status}
+              statusOptions={[
+                ["ALL", "All statuses"],
+                ["AVAILABLE", "Available"],
+                ["BUSY", "Busy"],
+                ["OFFLINE", "Offline"],
+              ]}
+              priorityOptions={[]}
+            />
           </div>
 
           <div className="border-border mt-5 overflow-x-auto border">
@@ -298,6 +281,8 @@ export default async function TechniciansPage({
               </div>
             </nav>
           ) : null}
+
+          {/* banner moved to header for visibility */}
         </section>
       </div>
     </main>

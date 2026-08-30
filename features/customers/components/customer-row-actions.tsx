@@ -113,11 +113,11 @@ export function CustomerRowActions({ customer }: { customer: CustomerRecord }) {
               </div>
               <button
                 aria-label="Close edit dialog"
-                className="text-muted hover:text-foreground inline-flex h-10 w-10 items-center justify-center"
+                className="text-muted hover:text-foreground inline-flex h-11 w-11 items-center justify-center"
                 onClick={() => setEditing(false)}
                 type="button"
               >
-                <X aria-hidden="true" className="size-4" />
+                <X aria-hidden="true" className="size-5" />
               </button>
             </div>
             <div className="mt-5">

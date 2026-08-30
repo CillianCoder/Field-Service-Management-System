@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 
 import { AppHeader } from "@/components/layout/app-header";
+import FiltersFormClient from "@/components/dashboard/FiltersFormClient";
 import {
   getWorkOrderManagementData,
   parseWorkOrderManagementFilters,
@@ -109,74 +110,15 @@ export default async function WorkOrdersPage({
                 {pagination.total === 1 ? "" : "s"} found
               </p>
             </div>
-            <form
-              className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1fr)_150px_150px_150px_auto]"
-              method="get"
-            >
-              <label className="sr-only" htmlFor="work-order-search">
-                Search work orders
-              </label>
-              <input
-                className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent h-11 border px-3 text-sm focus:outline-none"
-                defaultValue={filters.search}
-                id="work-order-search"
-                name="search"
-                placeholder="Job, customer, technician"
-              />
-              <select
-                aria-label="Status"
-                className="border-input bg-panel text-foreground focus:border-accent h-11 border px-3 text-sm focus:outline-none"
-                defaultValue={filters.status}
-                name="status"
-              >
-                <option value="ALL">All statuses</option>
-                {Object.entries(statusLabels).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-              <select
-                aria-label="Priority"
-                className="border-input bg-panel text-foreground focus:border-accent h-11 border px-3 text-sm focus:outline-none"
-                defaultValue={filters.priority}
-                name="priority"
-              >
-                <option value="ALL">All priorities</option>
-                {Object.entries(priorityLabels).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-              <select
-                aria-label="Sort work orders"
-                className="border-input bg-panel text-foreground focus:border-accent h-11 border px-3 text-sm focus:outline-none"
-                defaultValue={filters.sort}
-                name="sort"
-              >
-                <option value="SOONEST">Soonest scheduled</option>
-                <option value="LATEST">Latest scheduled</option>
-                <option value="PRIORITY">Priority</option>
-                <option value="UPDATED">Recently updated</option>
-              </select>
-              <div className="flex gap-2">
-                <button
-                  className="bg-foreground h-11 px-4 text-sm font-semibold text-white hover:opacity-90"
-                  type="submit"
-                >
-                  Apply
-                </button>
-                {isFiltered ? (
-                  <Link
-                    className="border-border text-foreground hover:bg-surface inline-flex h-11 items-center border px-4 text-sm font-semibold"
-                    href="/work-orders"
-                  >
-                    Clear
-                  </Link>
-                ) : null}
-              </div>
-            </form>
+            <FiltersFormClient
+              action="/work-orders"
+              initialSearch={filters.search}
+              initialStatus={filters.status}
+              initialPriority={filters.priority}
+              initialSort={filters.sort}
+              statusOptions={Object.entries(statusLabels)}
+              priorityOptions={Object.entries(priorityLabels)}
+            />
           </div>
 
           {workOrders.length > 0 ? (

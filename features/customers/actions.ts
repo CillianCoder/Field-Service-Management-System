@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { customerSchema } from "@/lib/validations/customer";
@@ -54,7 +55,6 @@ export async function saveCustomer(
 
     await prisma.customer.create({ data: parsed.data });
     revalidatePath("/customers");
-    return { error: null, success: "Customer created successfully." };
   } catch (error: unknown) {
     return {
       error:
@@ -63,6 +63,8 @@ export async function saveCustomer(
       success: null,
     };
   }
+
+  redirect("/customers?created=1");
 }
 
 export async function deleteCustomer(

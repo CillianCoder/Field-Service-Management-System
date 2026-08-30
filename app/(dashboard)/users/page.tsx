@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { Search } from "lucide-react";
-
 import { AppHeader } from "@/components/layout/app-header";
+import FiltersFormClient from "@/components/dashboard/FiltersFormClient";
 import { UserRowActions } from "@/features/users/components/user-row-actions";
 import { getUsers } from "@/features/users/queries";
 import { requireRole } from "@/lib/auth-session";
@@ -50,32 +49,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
 
         <section className="border-border bg-panel mt-6 border p-4 sm:p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <form
-              className="grid gap-3 sm:grid-cols-[minmax(240px,1fr)_auto]"
-              method="get"
-            >
-              <label className="text-foreground text-sm font-medium">
-                Search users
-                <span className="relative mt-2 block">
-                  <Search
-                    aria-hidden="true"
-                    className="text-muted pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
-                  />
-                  <input
-                    className="border-input bg-panel placeholder:text-muted focus:border-accent h-11 w-full min-w-70 border px-3 pl-9 text-sm focus:outline-none"
-                    defaultValue={search}
-                    name="search"
-                    placeholder="Name or email"
-                  />
-                </span>
-              </label>
-              <button
-                className="bg-accent hover:bg-accent-hover h-11 self-end px-5 text-sm font-semibold text-white"
-                type="submit"
-              >
-                Search
-              </button>
-            </form>
+            <FiltersFormClient action="/users" initialSearch={search} />
             <p aria-live="polite" className="text-muted text-sm">
               {users.length} user{users.length === 1 ? "" : "s"} found
             </p>

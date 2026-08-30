@@ -22,7 +22,11 @@ const createWorkOrderSchema = z.object({
     .refine(
       (value) => !Number.isNaN(new Date(value).getTime()),
       "Enter a valid scheduled date.",
-    ),
+    )
+    .refine((value) => {
+      const t = new Date(value).getTime();
+      return !Number.isNaN(t) && t >= Date.now();
+    }, "Scheduled date must be in the future."),
 });
 
 export async function createWorkOrder(
@@ -46,8 +50,30 @@ export async function createWorkOrder(
     };
   }
 
-  const scheduledDate = new Date(parsed.data.scheduledDate);
+  function parseLocalDateTime(value: string) {
+    const m =
+      /^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2})(?::([0-9]{2}))?$/.exec(
+        value,
+      );
+    if (!m) return null;
+    const year = Number(m[1]);
+    const month = Number(m[2]) - 1;
+    const day = Number(m[3]);
+    const hour = Number(m[4]);
+    const minute = Number(m[5]);
+    const second = Number(m[6] ?? "0");
+    return new Date(year, month, day, hour, minute, second);
+  }
+
+  const scheduledDate = parseLocalDateTime(parsed.data.scheduledDate);
   const technicianId = parsed.data.technicianId || null;
+
+  if (!scheduledDate) {
+    return {
+      ...initialCreateWorkOrderState,
+      fieldErrors: { scheduledDate: ["Enter a valid scheduled date."] },
+    };
+  }
 
   const [customer, technician] = await Promise.all([
     prisma.customer.findUnique({

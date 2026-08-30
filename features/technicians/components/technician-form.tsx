@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect, useRef } from "react";
 
 import { initialTechnicianActionState } from "@/features/technicians/action-state";
 import type { TechnicianActionState } from "@/features/technicians/action-state";
@@ -30,6 +30,24 @@ type TechnicianFormProps = Readonly<{
   onSuccess?: () => void;
 }>;
 
+type TechnicianDraft = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  status: (typeof TECHNICIAN_STATUSES)[number];
+  skills: string[];
+};
+
+const EMPTY_DRAFT: TechnicianDraft = {
+  name: "",
+  email: "",
+  phone: "",
+  password: "",
+  status: "AVAILABLE",
+  skills: [],
+};
+
 function FieldError({
   id,
   errors,
@@ -50,8 +68,17 @@ export function TechnicianForm({
   onCancel,
   onSuccess,
 }: TechnicianFormProps) {
-  const [selectedStatus, setSelectedStatus] = useState(
-    technician?.status ?? "AVAILABLE",
+  const [draft, setDraft] = useState<TechnicianDraft>(() =>
+    technician
+      ? {
+          name: technician.name,
+          email: technician.email,
+          phone: technician.phone,
+          password: "",
+          status: technician.status,
+          skills: technician.skills,
+        }
+      : EMPTY_DRAFT,
   );
   const [state, formAction, isPending] = useActionState<
     TechnicianActionState,
@@ -61,21 +88,65 @@ export function TechnicianForm({
       ? await updateTechnician(previousState, formData)
       : await createTechnician(previousState, formData);
     if (result.success) {
+      if (!technician) {
+        setDraft(EMPTY_DRAFT);
+      }
       onSuccess?.();
     }
     return result;
   }, initialTechnicianActionState);
+
+  const formRef = useRef<HTMLFormElement | null>(null);
+
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+
+    const inputs = Array.from(
+      form.querySelectorAll<HTMLInputElement>(
+        'input[name="skills"][type="checkbox"]',
+      ),
+    );
+
+    for (const input of inputs) {
+      const shouldBeChecked = draft.skills.includes(input.value);
+      if (input.checked !== shouldBeChecked) {
+        input.checked = shouldBeChecked;
+      }
+      // Keep React's internal tracker in sync if present
+      try {
+        const tracker = (
+          input as unknown as {
+            _valueTracker?: { setValue?: (v: string) => void };
+          }
+        )._valueTracker;
+        if (tracker && typeof tracker.setValue === "function") {
+          tracker.setValue(shouldBeChecked ? "true" : "false");
+        }
+      } catch {
+        // ignore tracker sync failures
+      }
+    }
+  }, [draft.skills, state]);
+
+  function updateDraft<K extends keyof TechnicianDraft>(
+    field: K,
+    value: TechnicianDraft[K],
+  ) {
+    setDraft((previous) => ({ ...previous, [field]: value }));
+  }
+
   const activeJobs =
     (technician?.assignedJobs ?? 0) + (technician?.inProgressJobs ?? 0);
   const showOfflineWarning = Boolean(
-    technician && selectedStatus === "OFFLINE" && activeJobs > 0,
+    technician && draft.status === "OFFLINE" && activeJobs > 0,
   );
   const showBusyInfo = Boolean(
-    technician && selectedStatus === "BUSY" && activeJobs > 0,
+    technician && draft.status === "BUSY" && activeJobs > 0,
   );
 
   return (
-    <form action={formAction} className="space-y-5" noValidate>
+    <form ref={formRef} action={formAction} className="space-y-5" noValidate>
       {technician ? (
         <input name="id" type="hidden" value={technician.id} />
       ) : null}
@@ -88,10 +159,11 @@ export function TechnicianForm({
               state.fieldErrors.name ? "technician-name-error" : undefined
             }
             className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-            defaultValue={technician?.name}
             name="name"
+            onChange={(event) => updateDraft("name", event.target.value)}
             placeholder="Alex Morgan"
             required
+            value={draft.name}
           />
           <FieldError
             id="technician-name-error"
@@ -105,11 +177,12 @@ export function TechnicianForm({
               state.fieldErrors.email ? "technician-email-error" : undefined
             }
             className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-            defaultValue={technician?.email}
             name="email"
+            onChange={(event) => updateDraft("email", event.target.value)}
             placeholder="technician@company.com"
             required
             type="email"
+            value={draft.email}
           />
           <FieldError
             id="technician-email-error"
@@ -126,11 +199,12 @@ export function TechnicianForm({
               state.fieldErrors.phone ? "technician-phone-error" : undefined
             }
             className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-            defaultValue={technician?.phone}
             name="phone"
+            onChange={(event) => updateDraft("phone", event.target.value)}
             placeholder="+1 555 010 2000"
             required
             type="tel"
+            value={draft.phone}
           />
           <FieldError
             id="technician-phone-error"
@@ -144,16 +218,17 @@ export function TechnicianForm({
               state.fieldErrors.status ? "technician-status-error" : undefined
             }
             className="border-input bg-panel text-foreground focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-            defaultValue={technician?.status ?? "AVAILABLE"}
             name="status"
             onChange={(event) => {
               const value = event.target.value;
               if ((TECHNICIAN_STATUSES as readonly string[]).includes(value)) {
-                setSelectedStatus(
+                updateDraft(
+                  "status",
                   value as (typeof TECHNICIAN_STATUSES)[number],
                 );
               }
             }}
+            value={draft.status}
           >
             {TECHNICIAN_STATUSES.map((status) => (
               <option key={status} value={status}>
@@ -176,8 +251,10 @@ export function TechnicianForm({
             autoComplete="new-password"
             className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
             name="password"
+            onChange={(event) => updateDraft("password", event.target.value)}
             required
             type="password"
+            value={draft.password}
           />
           <span
             className="text-muted mt-1 block text-xs"
@@ -206,8 +283,16 @@ export function TechnicianForm({
               key={skill}
             >
               <input
-                defaultChecked={technician?.skills.includes(skill)}
+                checked={draft.skills.includes(skill)}
                 name="skills"
+                onChange={(event) => {
+                  updateDraft(
+                    "skills",
+                    event.target.checked
+                      ? [...draft.skills, skill]
+                      : draft.skills.filter((s) => s !== skill),
+                  );
+                }}
                 type="checkbox"
                 value={skill}
               />
@@ -263,11 +348,6 @@ export function TechnicianForm({
           {state.error}
         </p>
       ) : null}
-      {state.success ? (
-        <p className="text-muted text-sm" role="status">
-          {state.success}
-        </p>
-      ) : null}
 
       <div className="flex flex-wrap gap-3">
         <button
@@ -281,7 +361,7 @@ export function TechnicianForm({
               ? "Save changes"
               : "Create technician"}
         </button>
-        {technician && onCancel ? (
+        {onCancel ? (
           <button
             className="border-border text-foreground hover:bg-surface h-11 border px-5 text-sm font-semibold"
             onClick={onCancel}

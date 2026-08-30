@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { AppHeader } from "@/components/layout/app-header";
+import FiltersFormClient from "@/components/dashboard/FiltersFormClient";
 import {
   getDashboardData,
   parseDashboardFilters,
@@ -214,53 +215,14 @@ export default async function DashboardPage({
                 New work order
               </Link>
             </div>
-            <form
-              className="mt-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_150px_150px_auto]"
-              method="get"
-            >
-              <label className="sr-only" htmlFor="dashboard-search">
-                Search work orders
-              </label>
-              <input
-                className="border-input bg-panel text-foreground h-11 border px-3 text-sm"
-                defaultValue={filters.search}
-                id="dashboard-search"
-                name="search"
-                placeholder="Search job, customer, technician"
-              />
-              <select
-                className="border-input bg-panel text-foreground h-11 border px-3 text-sm"
-                defaultValue={filters.status}
-                name="status"
-                aria-label="Status"
-              >
-                <option value="ALL">All statuses</option>
-                {Object.entries(statusLabels).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-              <select
-                className="border-input bg-panel text-foreground h-11 border px-3 text-sm"
-                defaultValue={filters.priority}
-                name="priority"
-                aria-label="Priority"
-              >
-                <option value="ALL">All priorities</option>
-                {Object.entries(priorityLabels).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-              <button
-                className="bg-accent h-11 px-4 text-sm font-semibold text-white"
-                type="submit"
-              >
-                Filter
-              </button>
-            </form>
+            <FiltersFormClient
+              action="/dashboard"
+              initialSearch={filters.search}
+              initialStatus={filters.status}
+              initialPriority={filters.priority}
+              statusOptions={Object.entries(statusLabels)}
+              priorityOptions={Object.entries(priorityLabels)}
+            />
 
             {data.recentWorkOrders.length > 0 ? (
               <div className="mt-5 overflow-x-auto">
@@ -316,10 +278,10 @@ export default async function DashboardPage({
                         </td>
                         <td className="border-border border-b px-3 py-4 pr-0">
                           <Link
-                            className="text-accent text-xs font-semibold hover:underline"
+                            className="text-accent text-xs font-semibold whitespace-nowrap hover:underline"
                             href={`/work-orders/${job.id}`}
                           >
-                            View
+                            View details
                           </Link>
                         </td>
                       </tr>

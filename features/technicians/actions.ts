@@ -2,6 +2,7 @@
 
 import { hashPassword } from "better-auth/crypto";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import type { TechnicianActionState } from "@/features/technicians/action-state";
 import { requireRole } from "@/lib/auth-session";
@@ -98,11 +99,7 @@ export async function createTechnician(
 
   revalidatePath("/technicians");
   revalidatePath("/dashboard");
-  return {
-    error: null,
-    success: "Technician account created successfully.",
-    fieldErrors: {},
-  };
+  redirect("/technicians?created=1");
 }
 
 export async function updateTechnician(

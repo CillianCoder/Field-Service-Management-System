@@ -2,6 +2,7 @@ import { ClipboardList, Search, Wrench } from "lucide-react";
 import Link from "next/link";
 
 import { AppHeader } from "@/components/layout/app-header";
+import FiltersFormClient from "@/components/dashboard/FiltersFormClient";
 import { JobCard } from "@/features/work-orders/components/job-card";
 import { LivePageContext } from "@/features/work-orders/components/live-page-context";
 import {
@@ -92,69 +93,20 @@ export default async function MyJobsPage({ searchParams }: MyJobsPageProps) {
           ))}
         </section>
 
-        <form className="border-border bg-panel mt-6 border p-4" method="get">
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_160px_160px_180px_auto] lg:items-end">
-            <label className="text-foreground text-sm font-medium">
-              Search jobs
-              <span className="relative mt-2 block">
-                <Search
-                  aria-hidden="true"
-                  className="text-muted pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
-                />
-                <input
-                  className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent h-11 w-full border pr-3 pl-9 text-sm focus:outline-none"
-                  defaultValue={filters.search}
-                  name="search"
-                  placeholder="Title, customer, or job ID"
-                />
-              </span>
-            </label>
-            <label className="text-foreground text-sm font-medium">
-              Status
-              <select
-                className="border-input bg-panel text-foreground focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-                defaultValue={filters.status}
-                name="status"
-              >
-                <option value="ALL">All statuses</option>
-                <option value="ASSIGNED">Assigned</option>
-                <option value="IN_PROGRESS">In progress</option>
-                <option value="COMPLETED">Completed</option>
-              </select>
-            </label>
-            <label className="text-foreground text-sm font-medium">
-              Priority
-              <select
-                className="border-input bg-panel text-foreground focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-                defaultValue={filters.priority}
-                name="priority"
-              >
-                <option value="ALL">All priorities</option>
-                <option value="URGENT">Urgent</option>
-                <option value="HIGH">High</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="LOW">Low</option>
-              </select>
-            </label>
-            <label className="text-foreground text-sm font-medium">
-              Sort by
-              <select
-                className="border-input bg-panel text-foreground focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-                defaultValue={filters.sort}
-                name="sort"
-              >
-                <option value="SOONEST">Soonest first</option>
-                <option value="LATEST">Latest first</option>
-                <option value="PRIORITY">Highest priority</option>
-                <option value="UPDATED">Recently updated</option>
-              </select>
-            </label>
-            <button
-              className="bg-accent hover:bg-accent-hover h-11 px-5 text-sm font-semibold text-white transition-colors"
-              type="submit"
-            >
-              Apply
-            </button>
+        <div className="border-border bg-panel mt-6 border p-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <Search aria-hidden="true" className="text-muted size-4 shrink-0" />
+            <div className="min-w-0 flex-1">
+              <FiltersFormClient
+                action="/my-jobs"
+                initialSearch={filters.search}
+                initialStatus={filters.status}
+                initialPriority={filters.priority}
+                initialSort={filters.sort}
+                statusOptions={Object.entries(statusLabels)}
+                priorityOptions={Object.entries(priorityLabels)}
+              />
+            </div>
           </div>
           {hasFilters ? (
             <Link
@@ -164,7 +116,7 @@ export default async function MyJobsPage({ searchParams }: MyJobsPageProps) {
               Clear filters
             </Link>
           ) : null}
-        </form>
+        </div>
 
         <section aria-label="Assigned jobs" className="mt-6">
           <div className="flex items-center justify-between gap-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 
 import { createWorkOrder } from "@/features/work-orders/management-actions";
 import {
@@ -16,6 +16,24 @@ type WorkOrderCreationFormProps = Readonly<{
     status: "AVAILABLE" | "BUSY" | "OFFLINE";
   }>;
 }>;
+
+type WorkOrderDraft = {
+  title: string;
+  customerId: string;
+  description: string;
+  scheduledDate: string;
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+  technicianId: string;
+};
+
+const EMPTY_DRAFT: WorkOrderDraft = {
+  title: "",
+  customerId: "",
+  description: "",
+  scheduledDate: "",
+  priority: "MEDIUM",
+  technicianId: "",
+};
 
 function FieldError({
   id,
@@ -36,10 +54,38 @@ export function WorkOrderCreationForm({
   customers,
   technicians,
 }: WorkOrderCreationFormProps) {
+  const [draft, setDraft] = useState<WorkOrderDraft>(EMPTY_DRAFT);
+  const [minScheduledDate, setMinScheduledDate] = useState("");
+  const [scheduledDateClientError, setScheduledDateClientError] = useState("");
   const [state, formAction, isPending] = useActionState<
     CreateWorkOrderState,
     FormData
   >(createWorkOrder, initialCreateWorkOrderState);
+
+  function updateDraft<K extends keyof WorkOrderDraft>(
+    field: K,
+    value: WorkOrderDraft[K],
+  ) {
+    setDraft((previous) => ({ ...previous, [field]: value }));
+  }
+
+  useEffect(() => {
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const now = new Date();
+    const local = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(
+      now.getDate(),
+    )}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    setMinScheduledDate(local);
+  }, []);
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    if (!draft.scheduledDate) return; // let required/browser handle empty
+    const t = new Date(draft.scheduledDate).getTime();
+    if (Number.isNaN(t) || t < Date.now()) {
+      event.preventDefault();
+      setScheduledDateClientError("Scheduled date must be in the future.");
+    }
+  }
 
   return (
     <form action={formAction} className="space-y-5" noValidate>
@@ -52,8 +98,10 @@ export function WorkOrderCreationForm({
             }
             className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
             name="title"
+            onChange={(event) => updateDraft("title", event.target.value)}
             placeholder="Replace rooftop HVAC unit"
             required
+            value={draft.title}
           />
           <FieldError errors={state.fieldErrors.title} id="title-error" />
         </label>
@@ -64,9 +112,10 @@ export function WorkOrderCreationForm({
               state.fieldErrors.customerId ? "customer-error" : undefined
             }
             className="border-input bg-panel text-foreground focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-            defaultValue=""
             name="customerId"
+            onChange={(event) => updateDraft("customerId", event.target.value)}
             required
+            value={draft.customerId}
           >
             <option disabled value="">
               Select customer
@@ -92,8 +141,10 @@ export function WorkOrderCreationForm({
           }
           className="border-input bg-panel text-foreground placeholder:text-muted focus:border-accent mt-2 min-h-32 w-full resize-y border p-3 text-sm focus:outline-none"
           name="description"
+          onChange={(event) => updateDraft("description", event.target.value)}
           placeholder="Describe the issue, requested work, and site requirements."
           required
+          value={draft.description}
         />
         <FieldError
           errors={state.fieldErrors.description}
@@ -110,11 +161,29 @@ export function WorkOrderCreationForm({
             }
             className="border-input bg-panel text-foreground focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
             name="scheduledDate"
+            onChange={(event) => {
+              const v = event.target.value;
+              updateDraft("scheduledDate", v);
+              const t = new Date(v).getTime();
+              if (!v || Number.isNaN(t) || t < Date.now()) {
+                setScheduledDateClientError(
+                  "Scheduled date must be in the future.",
+                );
+              } else {
+                setScheduledDateClientError("");
+              }
+            }}
             required
             type="datetime-local"
+            min={minScheduledDate || undefined}
+            value={draft.scheduledDate}
           />
           <FieldError
-            errors={state.fieldErrors.scheduledDate}
+            errors={
+              scheduledDateClientError
+                ? [scheduledDateClientError]
+                : state.fieldErrors.scheduledDate
+            }
             id="scheduled-error"
           />
         </label>
@@ -122,8 +191,18 @@ export function WorkOrderCreationForm({
           Priority
           <select
             className="border-input bg-panel text-foreground focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-            defaultValue="MEDIUM"
             name="priority"
+            onChange={(event) => {
+              const value = event.target.value;
+              if (
+                (["LOW", "MEDIUM", "HIGH", "URGENT"] as string[]).includes(
+                  value,
+                )
+              ) {
+                updateDraft("priority", value as WorkOrderDraft["priority"]);
+              }
+            }}
+            value={draft.priority}
           >
             <option value="LOW">Low</option>
             <option value="MEDIUM">Medium</option>
@@ -138,8 +217,11 @@ export function WorkOrderCreationForm({
               state.fieldErrors.technicianId ? "technician-error" : undefined
             }
             className="border-input bg-panel text-foreground focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-            defaultValue=""
             name="technicianId"
+            onChange={(event) =>
+              updateDraft("technicianId", event.target.value)
+            }
+            value={draft.technicianId}
           >
             <option value="">Leave unassigned</option>
             {technicians.map((technician) => (

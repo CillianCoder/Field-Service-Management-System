@@ -23,6 +23,7 @@ function roleLabel(role: string) {
 
 export function UserRowActions({ user }: { user: UserRecord }) {
   const [editing, setEditing] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(user.role);
   const [state, formAction, isPending] = useActionState<
     UserActionState,
     FormData
@@ -91,8 +92,14 @@ export function UserRowActions({ user }: { user: UserRecord }) {
                 Role
                 <select
                   className="border-input bg-panel focus:border-accent mt-2 h-11 w-full border px-3 text-sm focus:outline-none"
-                  defaultValue={user.role}
                   name="role"
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    if ((USER_ROLES as readonly string[]).includes(value)) {
+                      setSelectedRole(value as (typeof USER_ROLES)[number]);
+                    }
+                  }}
+                  value={selectedRole}
                 >
                   {USER_ROLES.map((role) => (
                     <option key={role} value={role}>
