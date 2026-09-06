@@ -1,11 +1,87 @@
 "use server";
 
+import { hashPassword } from "better-auth/crypto";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import type { UserActionState } from "@/features/users/action-state";
 import { requireRole } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
-import { updateUserRoleSchema } from "@/lib/validations/user";
+import { createUserSchema, updateUserRoleSchema } from "@/lib/validations/user";
+
+function isUniqueConstraintError(error: unknown) {
+  return error instanceof Error && "code" in error && error.code === "P2002";
+}
+
+function validationState(error: {
+  flatten: () => { fieldErrors: Record<string, string[]> };
+}): UserActionState {
+  return {
+    error: "Review the highlighted fields and try again.",
+    success: null,
+    fieldErrors: error.flatten().fieldErrors,
+  };
+}
+
+export async function createUser(
+  _previousState: UserActionState,
+  formData: FormData,
+): Promise<UserActionState> {
+  await requireRole(["ADMIN"]);
+  const parsed = createUserSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+    role: formData.get("role"),
+  });
+
+  if (!parsed.success) {
+    return validationState(parsed.error);
+  }
+
+  const { name, email, password, role } = parsed.data;
+
+  try {
+    const passwordHash = await hashPassword(password);
+    await prisma.$transaction(async (transaction) => {
+      const userId = crypto.randomUUID();
+      await transaction.user.create({
+        data: {
+          id: userId,
+          name,
+          email,
+          role,
+          emailVerified: false,
+        },
+      });
+      await transaction.account.create({
+        data: {
+          id: crypto.randomUUID(),
+          accountId: userId,
+          providerId: "credential",
+          userId,
+          password: passwordHash,
+        },
+      });
+    });
+  } catch (error: unknown) {
+    if (isUniqueConstraintError(error)) {
+      return {
+        error: "A user with this email already exists.",
+        success: null,
+        fieldErrors: { email: ["Use a different email address."] },
+      };
+    }
+    return {
+      error: "The user account could not be created. Please try again.",
+      success: null,
+      fieldErrors: {},
+    };
+  }
+
+  revalidatePath("/users");
+  redirect("/users?created=1");
+}
 
 export async function updateUserRole(
   _previousState: UserActionState,

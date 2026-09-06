@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AppHeader } from "@/components/layout/app-header";
 import FiltersFormClient from "@/components/dashboard/FiltersFormClient";
+import { UserForm } from "@/features/users/components/user-form";
 import { UserRowActions } from "@/features/users/components/user-row-actions";
 import { getUsers } from "@/features/users/queries";
 import { requireRole } from "@/lib/auth-session";
@@ -26,8 +27,12 @@ function dateLabel(date: Date) {
 
 export default async function UsersPage({ searchParams }: UsersPageProps) {
   await requireRole(["ADMIN"]);
-  const search = firstValue((await searchParams).search);
+  const params = await searchParams;
+  const search = firstValue(params.search);
   const users = await getUsers(search);
+  const created = Array.isArray(params.created)
+    ? params.created[0]
+    : params.created;
 
   return (
     <main className="bg-background min-h-screen">
@@ -45,7 +50,39 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
               Review account access and manage user roles.
             </p>
           </div>
+          {created === "1" ? (
+            <p
+              className="bg-success-subtle border-success-border text-success-text mt-4 flex items-center gap-2 border px-4 py-3 text-sm font-medium"
+              role="status"
+            >
+              <span aria-hidden="true" className="text-lg leading-none">
+                ✓
+              </span>
+              User account created successfully.
+            </p>
+          ) : null}
         </header>
+
+        <section
+          aria-labelledby="create-user-title"
+          className="border-border mt-6 border-b pb-6"
+        >
+          <div className="mb-5">
+            <h2
+              className="text-foreground text-xl font-semibold"
+              id="create-user-title"
+            >
+              Create user
+            </h2>
+            <p className="text-muted mt-1 text-sm">
+              Add an admin or dispatcher account. The initial password is hashed
+              and never stored as plain text.
+            </p>
+          </div>
+          <div className="max-w-3xl">
+            <UserForm key={created === "1" ? "created" : "fresh"} />
+          </div>
+        </section>
 
         <section className="border-border bg-panel mt-6 border p-4 sm:p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
