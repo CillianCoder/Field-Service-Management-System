@@ -33,7 +33,7 @@ function CustomerTable({
   customers: Awaited<ReturnType<typeof getCustomers>>;
 }) {
   return customers.length > 0 ? (
-    <div className="overflow-x-auto">
+    <div className="hidden overflow-x-auto lg:block">
       <table className="w-full min-w-[920px] border-separate border-spacing-0 text-left text-sm">
         <thead className="text-muted text-xs tracking-wide uppercase">
           <tr>
@@ -81,6 +81,66 @@ function CustomerTable({
       </table>
     </div>
   ) : null;
+}
+
+function CustomerCards({
+  customers,
+  search,
+}: {
+  customers: Awaited<ReturnType<typeof getCustomers>>;
+  search: string;
+}) {
+  return (
+    <ul className="mt-5 grid gap-3 lg:hidden">
+      {customers.map((customer) => (
+        <li className="border-border bg-panel border p-4" key={customer.id}>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-foreground font-semibold">{customer.name}</p>
+              <p className="text-muted mt-0.5 break-all">{customer.email}</p>
+            </div>
+            <span className="border-border bg-surface text-foreground shrink-0 border px-2 py-1 text-xs font-semibold">
+              {customer._count.workOrders}{" "}
+              {customer._count.workOrders === 1 ? "order" : "orders"}
+            </span>
+          </div>
+          <dl className="text-muted mt-3 grid grid-cols-1 gap-y-2 text-sm">
+            <div className="flex items-baseline gap-2">
+              <dt className="text-muted w-16 shrink-0 text-xs font-medium uppercase">
+                Phone
+              </dt>
+              <dd className="text-foreground min-w-0 break-all">
+                {customer.phone}
+              </dd>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <dt className="text-muted w-16 shrink-0 text-xs font-medium uppercase">
+                Address
+              </dt>
+              <dd className="text-foreground min-w-0 break-all">
+                {customer.address}
+              </dd>
+            </div>
+          </dl>
+          <div className="border-border mt-3 border-t pt-3">
+            <CustomerRowActions customer={customer} />
+          </div>
+        </li>
+      ))}
+      {customers.length === 0 ? (
+        <li className="border-border border border-dashed px-6 py-12 text-center">
+          <p className="text-foreground text-sm font-semibold">
+            {search ? "No customers match this search" : "No customers yet"}
+          </p>
+          <p className="text-muted mt-2 text-sm">
+            {search
+              ? "Try a different name, email, phone, or address."
+              : "Create the first customer record using the form above."}
+          </p>
+        </li>
+      ) : null}
+    </ul>
+  );
 }
 
 async function CustomersContent({ searchParams, role }: CustomersContentProps) {
@@ -158,7 +218,10 @@ async function CustomersContent({ searchParams, role }: CustomersContentProps) {
 
           <div className="mt-5">
             {customers.length > 0 ? (
-              <CustomerTable customers={customers} />
+              <>
+                <CustomerTable customers={customers} />
+                <CustomerCards customers={customers} search={search} />
+              </>
             ) : (
               <div className="border-border border border-dashed px-6 py-12 text-center">
                 <p className="text-foreground text-sm font-semibold">

@@ -225,70 +225,131 @@ export default async function DashboardPage({
             />
 
             {data.recentWorkOrders.length > 0 ? (
-              <div className="mt-5 overflow-x-auto">
-                <table className="w-full min-w-[860px] border-separate border-spacing-0 text-left text-sm">
-                  <caption className="sr-only">Recent work orders</caption>
-                  <thead className="text-muted text-xs tracking-wide uppercase">
-                    <tr>
-                      {[
-                        "Job",
-                        "Title",
-                        "Customer",
-                        "Technician",
-                        "Priority",
-                        "Scheduled",
-                        "Status",
-                        "Action",
-                      ].map((heading) => (
-                        <th
-                          className="border-border border-b px-3 py-3 font-semibold first:pl-0 last:pr-0"
-                          key={heading}
-                        >
-                          {heading}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.recentWorkOrders.map((job) => (
-                      <tr
-                        className="text-foreground hover:bg-surface/60 align-top transition-colors"
-                        key={job.id}
-                      >
-                        <td className="border-border border-b px-3 py-4 pl-0 font-mono text-xs font-semibold">
-                          {formatJobReference(job.jobNumber)}
-                        </td>
-                        <td className="border-border max-w-56 border-b px-3 py-4 leading-5 font-medium">
-                          {job.title}
-                        </td>
-                        <td className="text-muted border-border border-b px-3 py-4">
-                          {job.customer?.name ?? "Unassigned"}
-                        </td>
-                        <td className="text-muted border-border border-b px-3 py-4">
-                          {job.technician?.name ?? "Unassigned"}
-                        </td>
-                        <td className="border-border border-b px-3 py-4">
-                          <PriorityLabel priority={job.priority} />
-                        </td>
-                        <td className="text-muted border-border border-b px-3 py-4 whitespace-nowrap">
-                          {formatDate(job.scheduledDate)}
-                        </td>
-                        <td className="border-border border-b px-3 py-4">
-                          <StatusBadge status={job.status} />
-                        </td>
-                        <td className="border-border border-b px-3 py-4 pr-0">
-                          <Link
-                            className="text-accent text-xs font-semibold whitespace-nowrap hover:underline"
-                            href={`/work-orders/${job.id}`}
+              <>
+                <div className="mt-5 hidden overflow-x-auto lg:block">
+                  <table className="w-full min-w-[860px] border-separate border-spacing-0 text-left text-sm">
+                    <caption className="sr-only">Recent work orders</caption>
+                    <thead className="text-muted text-xs tracking-wide uppercase">
+                      <tr>
+                        {[
+                          "Job",
+                          "Title",
+                          "Customer",
+                          "Technician",
+                          "Priority",
+                          "Scheduled",
+                          "Status",
+                          "Action",
+                        ].map((heading) => (
+                          <th
+                            className="border-border border-b px-3 py-3 font-semibold first:pl-0 last:pr-0"
+                            key={heading}
                           >
-                            View details
-                          </Link>
-                        </td>
+                            {heading}
+                          </th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {data.recentWorkOrders.map((job) => (
+                        <tr
+                          className="text-foreground hover:bg-surface/60 align-top transition-colors"
+                          key={job.id}
+                        >
+                          <td className="border-border border-b px-3 py-4 pl-0 font-mono text-xs font-semibold">
+                            {formatJobReference(job.jobNumber)}
+                          </td>
+                          <td className="border-border max-w-56 border-b px-3 py-4 leading-5 font-medium">
+                            {job.title}
+                          </td>
+                          <td className="text-muted border-border border-b px-3 py-4">
+                            {job.customer?.name ?? "Unassigned"}
+                          </td>
+                          <td className="text-muted border-border border-b px-3 py-4">
+                            {job.technician?.name ?? "Unassigned"}
+                          </td>
+                          <td className="border-border border-b px-3 py-4">
+                            <PriorityLabel priority={job.priority} />
+                          </td>
+                          <td className="text-muted border-border border-b px-3 py-4 whitespace-nowrap">
+                            {formatDate(job.scheduledDate)}
+                          </td>
+                          <td className="border-border border-b px-3 py-4">
+                            <StatusBadge status={job.status} />
+                          </td>
+                          <td className="border-border border-b px-3 py-4 pr-0">
+                            <Link
+                              className="text-accent text-xs font-semibold whitespace-nowrap hover:underline"
+                              href={`/work-orders/${job.id}`}
+                            >
+                              View details
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile card list (below lg) */}
+                <ul className="mt-5 grid gap-3 lg:hidden">
+                  {data.recentWorkOrders.map((job) => (
+                    <li
+                      className="border-border bg-panel border p-4"
+                      key={job.id}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-foreground font-mono text-xs font-semibold">
+                            {formatJobReference(job.jobNumber)}
+                          </p>
+                          <p className="text-foreground mt-1 font-semibold">
+                            {job.title}
+                          </p>
+                        </div>
+                        <StatusBadge status={job.status} />
+                      </div>
+
+                      <dl className="text-muted mt-3 grid gap-y-2 text-sm">
+                        <div className="flex items-baseline gap-2">
+                          <dt className="text-muted w-16 shrink-0 text-xs font-medium uppercase">
+                            Customer
+                          </dt>
+                          <dd className="text-foreground min-w-0 break-all">
+                            {job.customer?.name ?? "Unassigned"}
+                          </dd>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                          <dt className="text-muted w-16 shrink-0 text-xs font-medium uppercase">
+                            Tech
+                          </dt>
+                          <dd className="text-foreground min-w-0">
+                            {job.technician?.name ?? "Unassigned"}
+                          </dd>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                          <dt className="text-muted w-16 shrink-0 text-xs font-medium uppercase">
+                            When
+                          </dt>
+                          <dd className="text-foreground min-w-0">
+                            {formatDate(job.scheduledDate)}
+                          </dd>
+                        </div>
+                      </dl>
+
+                      <div className="mt-3 flex items-center justify-between gap-3">
+                        <PriorityLabel priority={job.priority} />
+                        <Link
+                          className="text-accent text-xs font-semibold whitespace-nowrap underline-offset-4 hover:underline"
+                          href={`/work-orders/${job.id}`}
+                        >
+                          View details
+                        </Link>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </>
             ) : (
               <p className="text-muted border-border mt-5 border border-dashed p-8 text-center text-sm">
                 No work orders match the selected filters.

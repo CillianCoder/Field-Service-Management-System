@@ -129,7 +129,7 @@ export default async function TechniciansPage({
             />
           </div>
 
-          <div className="border-border mt-5 overflow-x-auto border">
+          <div className="border-border mt-5 hidden overflow-x-auto border lg:block">
             <table className="w-full min-w-240 border-collapse text-left text-sm">
               <thead className="bg-surface text-muted">
                 <tr>
@@ -222,25 +222,105 @@ export default async function TechniciansPage({
                     </tr>
                   );
                 })}
-                {technicians.length === 0 ? (
-                  <tr>
-                    <td className="px-6 py-12 text-center" colSpan={6}>
-                      <p className="text-foreground font-semibold">
-                        {isFiltered
-                          ? "No technicians match these filters"
-                          : "No technicians yet"}
-                      </p>
-                      <p className="text-muted mt-2 text-sm">
-                        {isFiltered
-                          ? "Try a different search or clear the filters."
-                          : "Create the first technician account using the form above."}
-                      </p>
-                    </td>
-                  </tr>
-                ) : null}
               </tbody>
             </table>
           </div>
+
+          {/* Mobile card list (below lg) */}
+          <ul className="mt-5 grid gap-3 lg:hidden">
+            {technicians.map((technician) => {
+              const assignedJobs = technician.workOrders.filter(
+                (job) => job.status === "ASSIGNED",
+              ).length;
+              const inProgressJobs = technician.workOrders.filter(
+                (job) => job.status === "IN_PROGRESS",
+              ).length;
+              return (
+                <li
+                  className="border-border bg-panel border p-4"
+                  key={technician.id}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-foreground font-semibold">
+                        {technician.name}
+                      </p>
+                      <p className="text-muted mt-0.5 break-all">
+                        {technician.email}
+                      </p>
+                    </div>
+                    <span
+                      className={`${statusClasses[technician.status]} inline-flex shrink-0 border px-2.5 py-1 text-xs font-semibold`}
+                    >
+                      {labelStatus(technician.status)}
+                    </span>
+                  </div>
+
+                  <dl className="text-muted mt-3 grid gap-y-2 text-sm">
+                    <div className="flex items-baseline gap-2">
+                      <dt className="text-muted w-16 shrink-0 text-xs font-medium uppercase">
+                        Phone
+                      </dt>
+                      <dd className="text-foreground min-w-0 break-all">
+                        {technician.phone}
+                      </dd>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <dt className="text-muted w-16 shrink-0 text-xs font-medium uppercase">
+                        Jobs
+                      </dt>
+                      <dd className="text-foreground min-w-0">
+                        {technician._count.workOrders} total · {assignedJobs}{" "}
+                        assigned · {inProgressJobs} in progress
+                      </dd>
+                    </div>
+                  </dl>
+
+                  {technician.skills.length > 0 ? (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {technician.skills.map((skill) => (
+                        <span
+                          className="border-border bg-surface text-foreground border px-2 py-1 text-xs"
+                          key={skill}
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <div className="border-border mt-3 border-t pt-3">
+                    <TechnicianRowActions
+                      technician={{
+                        id: technician.id,
+                        name: technician.name,
+                        email: technician.email,
+                        phone: technician.phone,
+                        skills: technician.skills,
+                        status: technician.status,
+                        assignedJobs,
+                        inProgressJobs,
+                      }}
+                    />
+                  </div>
+                </li>
+              );
+            })}
+            {technicians.length === 0 ? (
+              <li className="border-border border border-dashed px-6 py-12 text-center">
+                <p className="text-foreground text-sm font-semibold">
+                  {isFiltered
+                    ? "No technicians match these filters"
+                    : "No technicians yet"}
+                </p>
+                <p className="text-muted mt-2 text-sm">
+                  {isFiltered
+                    ? "Try a different search or clear the filters."
+                    : "Create the first technician account using the form above."}
+                </p>
+              </li>
+            ) : null}
+          </ul>
           {pagination.total > 0 ? (
             <nav
               aria-label="Technician directory pagination"

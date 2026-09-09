@@ -92,7 +92,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
             </p>
           </div>
 
-          <div className="border-border mt-6 overflow-x-auto border">
+          <div className="border-border mt-6 hidden overflow-x-auto border lg:block">
             <table className="w-full min-w-225 border-collapse text-left text-sm">
               <thead className="bg-surface text-muted">
                 <tr>
@@ -152,23 +152,74 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
                     </td>
                   </tr>
                 ))}
-                {users.length === 0 ? (
-                  <tr>
-                    <td className="px-6 py-12 text-center" colSpan={6}>
-                      <p className="text-foreground font-semibold">
-                        {search ? "No users match this search" : "No users yet"}
-                      </p>
-                      <p className="text-muted mt-2 text-sm">
-                        {search
-                          ? "Try a different name or email."
-                          : "Users will appear here after accounts are created."}
-                      </p>
-                    </td>
-                  </tr>
-                ) : null}
               </tbody>
             </table>
           </div>
+
+          {/* Mobile card list (below lg) */}
+          <ul className="mt-5 grid gap-3 lg:hidden">
+            {users.map((user) => (
+              <li className="border-border bg-panel border p-4" key={user.id}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-foreground font-semibold">{user.name}</p>
+                    <p className="text-muted mt-0.5 break-all">{user.email}</p>
+                  </div>
+                  <span className="border-border bg-surface text-foreground shrink-0 border px-2 py-1 text-xs font-semibold">
+                    {roleLabel(user.role)}
+                  </span>
+                </div>
+                <dl className="text-muted mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                  <div>
+                    <dt className="text-xs font-medium uppercase">
+                      Technician status
+                    </dt>
+                    <dd className="text-foreground mt-0.5">
+                      {user.technician
+                        ? roleLabel(user.technician.status)
+                        : "Not applicable"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-medium uppercase">
+                      Verification
+                    </dt>
+                    <dd className="text-foreground mt-0.5">
+                      {user.emailVerified ? "Verified" : "Unverified"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-medium uppercase">Created</dt>
+                    <dd className="text-foreground mt-0.5">
+                      {dateLabel(user.createdAt)}
+                    </dd>
+                  </div>
+                </dl>
+                <div className="border-border mt-3 border-t pt-3">
+                  <UserRowActions
+                    user={{
+                      id: user.id,
+                      name: user.name,
+                      email: user.email,
+                      role: user.role as (typeof USER_ROLES)[number],
+                    }}
+                  />
+                </div>
+              </li>
+            ))}
+            {users.length === 0 ? (
+              <li className="border-border border border-dashed px-6 py-12 text-center">
+                <p className="text-foreground text-sm font-semibold">
+                  {search ? "No users match this search" : "No users yet"}
+                </p>
+                <p className="text-muted mt-2 text-sm">
+                  {search
+                    ? "Try a different name or email."
+                    : "Users will appear here after accounts are created."}
+                </p>
+              </li>
+            ) : null}
+          </ul>
         </section>
       </div>
     </main>
