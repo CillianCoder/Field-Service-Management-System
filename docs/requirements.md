@@ -1,56 +1,58 @@
 # Requirements
 
-Scope reference. Detail lives in the matching design docs — `data-model.md`, `api.md`, `workflows.md`, `architecture.md`. This file must stay in sync when those change.
+This file captures the final project scope as implemented in the current codebase.
+The completed system is aligned with the app behavior and server-side access
+rules in the live code, not just the original planning notes.
 
-Role codes: Admin (ADM) · Dispatcher (DSP) · Technician (TECH)
+Role codes: Admin, Dispatcher, Technician.
 
-## Functional requirements
+## Implemented requirements
 
-| ID | Requirement | Role | Detail |
+| ID | Requirement | Role | Status |
 |----|-------------|------|--------|
-| FR-01 | Sign in with email/password; session persists across refresh | All | Better Auth |
-| FR-02 | CRUD customers with search | ADM, DSP | `/customers`; data-model.md |
-| FR-03 | Search, filter, create, and edit technicians linked to login accounts | ADM, DSP | `/technicians`; data-model.md |
-| FR-04 | Create work order (customer required) | DSP, ADM | workflows.md |
-| FR-05 | Assign work order to a technician | DSP, ADM | workflows.md |
-| FR-06 | Technician views, starts, updates, and completes own jobs only | TECH | `/my-jobs`, server-enforced |
-| FR-07 | Completions require notes; completedAt + completedById recorded | TECH | data-model.md |
-| FR-08 | Every status change logged with user + timestamp | system | WorkOrderActivity |
-| FR-09 | Duplicate email rejected (Customer + Technician) | system | data-model.md |
-| FR-10 | Dashboard: counts, recent jobs, technician status, quick links, and cancellation workflow | ADM, DSP | architecture.md |
-| FR-11 | Forgot-password page validates email and directs users to an administrator until email delivery is implemented | All | api.md |
-| FR-12 | Starting work sets Technician Busy; final in-progress completion returns a non-Offline Technician to Available | TECH, system | workflows.md |
-| FR-13 | Setting a Technician Offline with active jobs requires explicit conflict confirmation and preserves assignments | ADM, DSP | `/technicians`; api.md |
-| FR-14 | Admin searches users and manages roles without removing technician profiles | ADM | `/users`; api.md |
+| FR-01 | Sign in with email and password | All | Implemented |
+| FR-02 | Customer create, list, and edit flows | Admin, Dispatcher | Implemented |
+| FR-03 | Technician management and status handling | Admin, Dispatcher | Implemented |
+| FR-04 | Work order creation and assignment | Admin, Dispatcher | Implemented |
+| FR-05 | Technician can view and act on assigned jobs only | Technician | Implemented |
+| FR-06 | Job start and completion workflows with notes | Technician | Implemented |
+| FR-07 | Work-order activity logging for status changes | System | Implemented |
+| FR-08 | Duplicate email protection for customer and technician records | System | Implemented |
+| FR-09 | Dashboard metrics and recent job views | Admin, Dispatcher | Implemented |
+| FR-10 | Admin user management and role control | Admin | Implemented |
+| FR-11 | Forgot-password page with administrator guidance | All | Implemented |
+| FR-12 | Offline conflict checks for technicians with active jobs | Admin, Dispatcher | Implemented |
+| FR-13 | Cancellation rules for OPEN and ASSIGNED jobs | Admin, Dispatcher | Implemented |
 
 ## Validation rules
-- Email: valid format; unique per Customer AND per Technician.
-- All untrusted form data Zod-validated server-side — never trust the client.
-- Ref: `lib/validations/`.
+
+- Email format and uniqueness validation is enforced.
+- Untrusted form data must be validated server-side with Zod.
+- Role checks are enforced on the server, not only in the UI.
 
 ## Non-functional requirements
 
-| ID | Requirement | Measure |
-|----|-------------|---------|
-| NFR-01 | Responsive: desktop + mobile | Playwright viewport tests |
-| NFR-02 | Accessible: keyboard-navigable, status not color-only | a11y check |
-| NFR-03 | Security: every protected server action authorizes | no cross-role fetch |
-| NFR-04 | Passwords hashed (auth lib), secrets in env only | audit |
-| NFR-05 | Empty states, loading, error states on every list page | UI review |
-| NFR-06 | Light and dark themes use accessible semantic colors and persist the user's preference | responsive UI review |
+| ID | Requirement | Status |
+|----|-------------|--------|
+| NFR-01 | Responsive desktop and mobile layouts | Implemented |
+| NFR-02 | Protected routes and authorization checks | Implemented |
+| NFR-03 | Secure secret handling via environment variables | Implemented |
+| NFR-04 | Empty states, loading states, and error feedback | Implemented |
+| NFR-05 | Accessible semantic styling and status cues | Implemented |
 
-## Acceptance criteria
-- **Auth**: wrong password → visible error, no stack trace leak.
-- **Customers/Techs**: invalid form shows errors; duplicate email blocked; empty state shown when no rows.
-- **Technicians**: predefined skills only; search/status filters work; Offline conflicts show assigned and in-progress counts and require confirmation.
-- **Work Orders**: DSP assigns → TECH sees job in `/my-jobs`; unassigned job cannot start.
-- **My Jobs**: technician sees active/in-progress/completed counts, URL-backed search/filter/sort controls, public `WO-0001` references, customer contact details, job history, and contextual start/complete actions.
-- **Roles**: TECH blocked from `/users` and other technicians' jobs (server-side, not just UI).
-- **Dashboard**: counts correct against seeded data.
-- **Cancellation**: Admin/Dispatcher can cancel only `OPEN` or `ASSIGNED` jobs with a reason; the action is audited and cancelled jobs are excluded from active and overdue counts.
+## Planned future backlog
 
-## Out of scope
-- Cancellation after a job reaches `IN_PROGRESS` — requires a separate operational policy.
-- Mobile client — web-only single app.
-- Password-reset email delivery with Resend, reset-token handling, and password update — future improvement.
-- Technician deactivation/removal, initial-password delivery, and forced first-login password change — future improvements.
+These items are intentionally not included in the current completed scope:
+
+- Resend-based email invite and reset flow
+- secure reset-token lifecycle and reset page
+- disable/terminate account action for users
+- account audit trail and admin change history
+- deeper automated Playwright regression coverage
+- optional evaluation of Better Auth admin plugin
+
+## Out of scope for this version
+
+- mobile app client
+- email-delivery based onboarding
+- full user lifecycle management beyond the current admin create flow

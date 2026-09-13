@@ -1,108 +1,72 @@
-# API
+# API and server actions
 
-Next.js App Router — no separate REST API. Data access via **Server Actions / Route Handlers** backed by Prisma. All server actions must re-validate and authorize.
+The project uses the Next.js App Router with server actions instead of a separate
+REST API layer. The main data operations are performed through authenticated
+server actions backed by Prisma.
 
-## Conventions
-- **Auth**: Better Auth sessions (email/password). Session persists after refresh.
-- **Authorization**: every protected server action checks role server-side. Not just hidden buttons.
-- **Validation**: Zod schemas for all untrusted form data (`lib/validations/`).
-- **Errors**: user-facing messages; never expose stack traces.
-- **Data flow**: react hook form (optional) → server action → Zod → Prisma.
+## Core conventions
 
-Better Auth is mounted at `/api/auth/[...all]`. Public sign-up is disabled.
-Admin and Dispatcher users can provision Technician accounts through the
-protected `/technicians` server action. The User, credential Account, and
-Technician profile are created atomically, and Better Auth hashes the initial
-password before it is stored in `Account.password`.
+- Better Auth manages login sessions and protected page access.
+- Every protected action validates the current user and role on the server.
+- Zod validates all untrusted form inputs before database writes.
+- Errors are user-friendly and do not leak internal stack traces.
+- Revalidation is used after create and update operations so list pages refresh.
 
 ## Route map
-| Route | Main User | Purpose |
-|-------|-----------|---------|
+
+| Route | Main users | Purpose |
+|-------|------------|---------|
 | `/login` | All | Sign in |
-| `/forgot-password` | All | Validate a recovery email and show administrator guidance |
-| `/dashboard` | Admin, Dispatcher | Operations summary |
-| `/customers` | Admin, Dispatcher | Search and manage customers |
-| `/users` | Admin | Manage accounts & roles |
-| `/customers` | Admin, Dispatcher | Customer CRUD |
-| `/technicians` | Admin, Dispatcher | Search, filter, create, and edit technicians |
-| `/work-orders` | Admin, Dispatcher | List, filter, manage |
-| `/work-orders/new` | Admin, Dispatcher | Create work order |
-| `/work-orders/[id]` | Admin, Dispatcher, Technician | View a job; technicians can view assigned jobs only |
+| `/forgot-password` | All | Shared guidance flow until email delivery is configured |
+| `/dashboard` | Admin, Dispatcher | Operational overview |
+| `/customers` | Admin, Dispatcher | Customer management |
+| `/users` | Admin | User account and role management |
+| `/technicians` | Admin, Dispatcher | Technician management |
+| `/work-orders` | Admin, Dispatcher | Work-order directory and filters |
+| `/work-orders/new` | Admin, Dispatcher | New job creation |
+| `/work-orders/[id]` | Admin, Dispatcher, Technician | Job detail view |
 | `/my-jobs` | Technician | Assigned jobs only |
 
-## Key actions
-| Action | Roles | Server rule |
-|--------|-------|-------------|
-| Manage users/roles | Admin only | 403 otherwise |
-| Search users | Admin only | searches account name and email |
-| Edit user role | Admin only | self-demotion blocked; technician role requires a Technician profile |
-| Create customers | Admin, Dispatcher | duplicate email blocked |
-| Create technicians | Admin, Dispatcher | User, credential Account, and Technician created atomically |
-| Edit technicians | Admin, Dispatcher | User and Technician name/email remain synchronized |
-| Set technician Offline | Admin, Dispatcher | active-job conflicts require explicit confirmation |
-| Create WOs | Admin, Dispatcher | customer, title, desc, scheduled date required |
-| Assign technician | Admin, Dispatcher | sets ASSIGNED |
-| View WOs | Admin, Dispatcher | all |
-| View jobs | Technician | own only |
-| Start work | all (own) | requires assigned technician |
-| Complete job | all (own) | completion notes required |
-| Cancel work order | Admin, Dispatcher | only `OPEN` or `ASSIGNED`; reason required; terminal `CANCELLED` state |
+## Implemented actions
 
-The Admin/Dispatcher `/work-orders` directory accepts URL parameters for
-`search`, `status`, `priority`, `sort`, and `page`. Search matches the public
-job number (`WO-0001`), title, customer, and technician. Pagination links
-preserve the active filters, while filter submissions reset to page one.
+| Action | Roles | Notes |
+|--------|-------|-------|
+| Create user | Admin | Account and role creation via server action |
+| Manage roles | Admin | Self-demotion and role safety checks |
+| Create customer | Admin, Dispatcher | duplicate email validation |
+| Edit customer | Admin, Dispatcher | updates existing record |
+| Create technician | Admin, Dispatcher | linked user + technician profile |
+| Edit technician | Admin, Dispatcher | status and profile updates |
+| Set technician offline | Admin, Dispatcher | blocks assignment if active jobs exist |
+| Create work order | Admin, Dispatcher | customer required, assignment validation |
+| Assign technician | Admin, Dispatcher | updates status and records activity |
+| View technician jobs | Technician | own assigned jobs only |
+| Start job | Technician | requires assigned status |
+| Complete job | Technician | requires final notes |
+| Cancel work order | Admin, Dispatcher | only valid for OPEN/ASSIGNED jobs |
 
-The `/work-orders/new` form validates all fields server-side. A customer is
-required, a technician is optional, and a new assignment cannot target an
-`OFFLINE` technician. New unassigned jobs start as `OPEN`; jobs created with a
-valid non-offline technician start as `ASSIGNED`. Creation and its initial
-`STATUS_CHANGED` activity are committed in one transaction. The dashboard,
-work-order directory, and technician job list are revalidated after creation.
+## Important behavior
 
-The `/my-jobs` page reads URL parameters for `search`, `status`, `priority`, and
-`sort`. The server resolves the technician from the authenticated user ID before
-querying work orders, so client-provided technician IDs are never trusted.
-Work orders have an internal CUID and a separate unique numeric `jobNumber`.
-The UI displays the public number as `WO-0001`; server actions continue using
-the internal work-order ID.
+- The `/work-orders` list supports query filtering and preserves search state.
+- The `/my-jobs` page resolves the technician from the authenticated user before querying work orders.
+- Job status changes write `WorkOrderActivity` entries with timestamps and actor information.
+- Assigning to an offline technician is rejected.
+- Technician offline transitions require explicit confirmation when active jobs exist.
+- Cancellation is allowed only for valid active states and requires a reason.
 
-Technician job actions are implemented as a server action. `START` transitions
-`ASSIGNED` to `IN_PROGRESS`; `COMPLETE` transitions `IN_PROGRESS` to
-`COMPLETED` and requires notes. Each action writes a `WorkOrderActivity` row in
-the same transaction as the work-order update. Starting work also sets the
-Technician to `BUSY`. Completing the final in-progress job returns a non-Offline
-Technician to `AVAILABLE`. The My Jobs query also returns
-the assigned customer's name, address, phone, email, and chronological activity
-records for the technician's job-history display.
+## Error handling
 
-Setting a Technician to `OFFLINE` does not unassign existing work. When active
-assigned or in-progress jobs exist, the edit form shows their counts and the
-server action requires explicit confirmation. Offline technicians must be
-excluded from future assignment options.
+- Invalid form input → field error messages from Zod
+- Unauthorized access → redirect or denial based on role
+- Duplicate email → clear validation message
+- Missing or invalid records → handled in server action logic
 
-The `/technicians` directory uses URL-backed `search`, `status`, and `page`
-parameters. Pagination links preserve active filters, filter submissions reset
-to the first page, and browser Back/Forward restores the previous directory
-state.
+## Future backlog
 
-The work-order detail cancellation server action authorizes Admin or Dispatcher roles,
-validates a non-empty reason, allows cancellation only from `OPEN` or `ASSIGNED`,
-updates the work order and writes the `STATUS_CHANGED` activity in one
-transaction. Cancelled work orders remain searchable and visible as history but
-are excluded from active workload and overdue counts. Technicians cannot invoke
-the cancellation action.
+The following are not part of the current production-ready implementation:
 
-## Error responses
-- Invalid form → field-level Zod messages.
-- Unauthorized → redirect to login (or role-appropriate page).
-- Duplicate email → clear message on the field.
-
-## Offline / sync
-Not in scope. Web-only, live connection via server actions.
-
-## Future auth improvements
-- Configure Better Auth's `sendResetPassword` callback with Resend.
-- Add secure reset-link expiry, invalid-token handling, and a reset-password page.
-- Until email delivery is configured, `/forgot-password` sends no request and does
-	not claim an email was sent or reveal whether an account exists.
+- Resend-based password reset and invite email delivery
+- reset-token flow and reset-password page
+- invite-link onboarding with first-time password setup
+- account disable/terminate lifecycle
+- audit history for user management changes

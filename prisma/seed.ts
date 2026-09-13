@@ -47,7 +47,11 @@ async function main() {
     }
 
     const passwordHash = await hashPassword(password);
-    const { passwordEnv: _passwordEnv, ...userData } = demoUser;
+    const userData: Omit<typeof demoUser, "passwordEnv"> = {
+      name: demoUser.name,
+      email: demoUser.email,
+      role: demoUser.role,
+    };
     const user = await prisma.user.upsert({
       where: { email: demoUser.email },
       update: {

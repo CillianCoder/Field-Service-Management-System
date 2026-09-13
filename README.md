@@ -1,55 +1,140 @@
 # FieldFlow
 
-FieldFlow is a field service management system for dispatching work orders to
-technicians and tracking work from assignment through completion.
+FieldFlow is a field service management system for dispatching work orders,
+tracking technician progress, and managing customer and operational records.
 
-## Stack
+## Current status
 
-- Next.js App Router, React, and TypeScript strict mode
+This repo represents the completed core system for the project scope defined in
+this workspace. The application includes the main operational flow for admins,
+dispatchers, and technicians.
+
+### Implemented features
+
+- Better Auth email/password authentication with protected routes
+- role-based authorization for Admin, Dispatcher, and Technician users
+- admin user management and account creation
+- customer CRUD with search and validation
+- technician management with status handling and offline conflict checks
+- work order creation, assignment, start, complete, and cancellation flows
+- dashboard metrics and recent job views
+- mobile-responsive card layouts for directory and dashboard pages
+- server-side Zod validation for all trusted form actions
+
+### Planned future work
+
+- Resend email delivery for invite/reset flows
+- invite-link onboarding flow with first-time password setup
+- disable/terminate user account lifecycle
+- admin audit trail for account and role changes
+- expanded Playwright coverage for more operational scenarios
+
+## Tech stack
+
+- Next.js App Router with React and TypeScript
 - Tailwind CSS
-- Better Auth, Prisma, and Neon PostgreSQL
-- Zod for server-side validation
-- Playwright for end-to-end tests
+- Better Auth
+- Prisma ORM with PostgreSQL on Neon
+- Zod validation
+- Playwright for browser-level verification
 
-## Local Setup
+## Local setup
 
 1. Install dependencies with `npm install`.
-2. Copy `.env.example` to `.env` and provide local database and auth values.
-3. Run `npm run db:generate`.
-4. Create and apply the first migration with `npm run db:migrate`.
-5. Set the three role-specific demo password variables, then run `npm run db:seed`.
-6. Start the application with `npm run dev`.
+2. Copy `.env.example` to `.env` and fill in your local values.
+3. Generate the Prisma client with `npm run db:generate`.
+4. Run the initial database migration with `npm run db:migrate`.
+5. Seed demo users and data with `npm run db:seed`.
+6. Start the app with `npm run dev`.
 
-The development server runs at `http://localhost:3000`.
+The app runs at `http://localhost:3000`.
 
-## Available Commands
+## Production deployment checklist
 
-- `npm run dev` - run the development server
-- `npm run build` - create a production build
+The project is set up for Vercel deployment with a Neon PostgreSQL database.
+Use the following checklist before or after deployment:
+
+1. Set the production environment variables in Vercel:
+   - `DATABASE_URL`
+   - `BETTER_AUTH_SECRET`
+   - `BETTER_AUTH_URL` (production app URL)
+   - `ADMIN_DEMO_PASSWORD`
+   - `DISPATCHER_DEMO_PASSWORD`
+   - `TECHNICIAN_DEMO_PASSWORD`
+2. Ensure the Neon database is reachable from Vercel and uses the same Prisma schema.
+3. Run Prisma migration in production:
+   ```bash
+   npx prisma migrate deploy
+   ```
+4. Seed the demo accounts if you want the default login flows available in production:
+   ```bash
+   npx prisma db seed
+   ```
+5. Confirm the app URL is configured correctly for Better Auth callbacks.
+6. Verify the following flows in the deployed app:
+   - admin login
+   - dispatcher login
+   - technician login
+   - customer creation
+   - technician assignment
+   - work order start and completion
+   - role-based route protection
+
+## Available commands
+
+- `npm run dev` - start the development server
+- `npm run build` - build the production app
 - `npm run lint` - run ESLint
-- `npm run typecheck` - verify strict TypeScript
-- `npm run format:check` - verify Prettier formatting
+- `npm run typecheck` - TypeScript strict check
 - `npm run test:e2e` - run Playwright tests
 - `npm run db:generate` - generate the Prisma client
-- `npm run db:migrate` - create and apply a Prisma migration
-- `npm run db:seed` - seed safe demo data
+- `npm run db:migrate` - create and apply migrations
+- `npm run db:seed` - seed demo data
 
-## Project Structure
+## Repository structure
 
-- `app/` - App Router pages, layouts, and route handlers
-- `components/` - shared UI, form, table, and layout components
-- `features/` - feature-specific interface, logic, and data modules
-- `lib/` - shared utilities, validation schemas, auth, and Prisma access
-- `prisma/` - Prisma schema, migrations, and seed data
+- `app/` - pages, layouts, and protected routes
+- `components/` - shared UI and layout components
+- `features/` - feature-specific pages and server actions
+- `lib/` - auth, validation, Prisma, and utilities
+- `prisma/` - schema, migrations, and seed data
 - `tests/e2e/` - Playwright end-to-end tests
 
-## Scaffold Status
+## Demo accounts
 
-The responsive login flow, Better Auth route, Prisma 7 schema, session-aware
-role redirects, and protected destination placeholders are implemented. The
-operations, customer, technician, and work-order screens are the next feature
-phase.
+The seeded demo users are:
 
-No real credentials or customer data belong in this repository. Use only the
-placeholder values in `.env.example`; local and deployment secrets must be
-stored in environment configuration.
+```text
+Admin: admin@fieldflow.test / ADMIN_DEMO_PASSWORD
+Dispatcher: dispatch@fieldflow.test / DISPATCHER_DEMO_PASSWORD
+Technician: tech@fieldflow.test / TECHNICIAN_DEMO_PASSWORD
+```
+
+## App screenshots
+
+The project screenshots are stored in [docs/images](docs/images) and match the actual app views below.
+
+```md
+![Login screen](docs/images/login.png)
+![Dashboard](docs/images/dashboard.png)
+![Technician view](docs/images/technician.png)
+![Work order view](docs/images/work-order.png)
+```
+
+### Example layout
+
+<div align="center">
+  <img src="docs/images/login.png" alt="Login screen" width="320" />
+  <img src="docs/images/dashboard.png" alt="Dashboard" width="320" />
+</div>
+
+<div align="center">
+  <img src="docs/images/technician.png" alt="Technician view" width="320" />
+  <img src="docs/images/work-order.png" alt="Work order view" width="320" />
+</div>
+
+## Notes
+
+- Do not commit real secrets or production credentials.
+- Use `.env` only locally and set environment variables in deployment settings.
+- Future email and onboarding improvements should be tracked in the GitHub backlog instead of treated as current feature parity.

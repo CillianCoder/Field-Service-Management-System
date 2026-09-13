@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React from "react";
 
 type Props = {
@@ -21,6 +22,7 @@ export default function FiltersFormClient({
   statusOptions = [],
   priorityOptions = [],
 }: Props) {
+  const router = useRouter();
   const [search, setSearch] = React.useState(initialSearch ?? "");
   const [status, setStatus] = React.useState(initialStatus ?? "ALL");
   const [priority, setPriority] = React.useState(initialPriority ?? "ALL");
@@ -30,11 +32,12 @@ export default function FiltersFormClient({
     e.preventDefault();
     const params = new URLSearchParams();
     if (search) params.set("search", search);
-    if (status) params.set("status", status);
-    if (priority) params.set("priority", priority);
+    if (status && status !== "ALL") params.set("status", status);
+    if (priority && priority !== "ALL") params.set("priority", priority);
     if (sort) params.set("sort", sort);
-    const href = `${action || window.location.pathname}?${params.toString()}`;
-    window.location.href = href;
+    const query = params.toString();
+    const href = `${action || "/"}`;
+    router.push(query ? `${href}?${query}` : href);
   }
 
   return (
@@ -112,7 +115,7 @@ export default function FiltersFormClient({
             setStatus("ALL");
             setPriority("ALL");
             setSort("SOONEST");
-            window.location.href = action || window.location.pathname;
+            router.push(action || "/");
           }}
           className="border-border text-foreground hover:bg-surface inline-flex h-11 min-w-0 items-center border px-4 text-sm font-semibold whitespace-nowrap"
         >

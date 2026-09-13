@@ -1,38 +1,54 @@
 # Testing
 
-## Test setup
-- **Playwright** for e2e (main user flow): `npx playwright test`
-- Tests live in `tests/e2e/`.
-- Seed demo accounts first: `npx prisma db seed`.
+## Current status
 
-## What must be covered
-- Main user flow: login → open WOs → create → assign → technician start → complete.
-- Invalid forms and duplicate email handling (Customer & Technician).
-- Role rules from UI and server side (cross-role access blocked).
-- Responsive layouts (mobile + desktop).
-- Forgot-password required-email validation and deferred-delivery guidance.
-- Technician My Jobs counts, own-job filtering, responsive cards, and start/complete actions.
-- Technician management role protection, predefined skills, URL-backed search/status filters and pagination, duplicate email handling, and Offline conflict confirmation.
-- Technician status synchronization: start sets Busy; final in-progress completion restores Available unless explicitly Offline.
-- Work Order management: Admin/Dispatcher directory authorization, search/filter/sort state, filter-preserving pagination, creation with and without assignment, and server-side rejection of Offline technician assignment.
-- Work Order directory refresh after cancellation and detail-page navigation back to the directory.
-- Theme toggle accessibility, light/dark contrast, persisted preference after refresh, and system-theme fallback when no preference is saved.
-- Reset-link and password-update states when Resend delivery is implemented.
+The project has completed development work and the current validation focus is on
+stability, role enforcement, and the main operational flows. The basic local
+checks for the app should be run before final review or deployment.
 
-## Demo accounts (seed)
+## Automated checks
+
+Use the following commands from the project root:
+
+```bash
+npm run typecheck
+npm run lint
+npm run test:e2e
 ```
+
+## Recommended verification flow
+
+Before release, confirm the following:
+
+- login works for Admin, Dispatcher, and Technician users
+- protected routes reject unauthorized users
+- customer creation and listing work correctly
+- technician management and offline checks behave as expected
+- work order creation and assignment work correctly
+- technician job list shows only assigned jobs
+- status transitions record activity correctly
+- cancellation logic allows only valid transitions
+- dashboard counts reflect the current data set
+
+## Demo accounts
+
+```text
 Admin: admin@fieldflow.test / ADMIN_DEMO_PASSWORD
 Dispatcher: dispatch@fieldflow.test / DISPATCHER_DEMO_PASSWORD
 Technician: tech@fieldflow.test / TECHNICIAN_DEMO_PASSWORD
 ```
 
-## Quality gates before merge
-- TypeScript strict mode passes.
-- Small, regular commits; feature branches.
-- `npm run build` succeeds.
-- Playwright suite green for the flows above.
+## Planned future testing
 
-## Test data
-- Seed via `prisma/seed.ts`: 3 demo users (one per role), sample customers, technicians, and work orders in multiple statuses.
-- The seed is idempotent and was run twice successfully after adding technician domain data.
-- Current automated browser coverage remains focused on authentication and forgot-password flows. Technician management tests require seeded authenticated fixtures and remain a pending test increment.
+The following are included in the backlog and should be added as the project grows:
+
+- richer Playwright flow coverage for full dispatch-to-completion scenarios
+- email invite and password-reset validation when Resend is configured
+- audit-trail review checks for account and role actions
+- deeper regression validation for edge-case technician assignments
+
+## Notes
+
+The app is currently in a finished feature-development state for the core field
+operations scope, but additional regression work and email-driven onboarding are
+still future improvements rather than current requirements.

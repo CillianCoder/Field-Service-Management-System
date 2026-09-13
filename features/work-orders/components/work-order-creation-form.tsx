@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 
 import { createWorkOrder } from "@/features/work-orders/management-actions";
 import {
@@ -55,36 +55,25 @@ export function WorkOrderCreationForm({
   technicians,
 }: WorkOrderCreationFormProps) {
   const [draft, setDraft] = useState<WorkOrderDraft>(EMPTY_DRAFT);
-  const [minScheduledDate, setMinScheduledDate] = useState("");
   const [scheduledDateClientError, setScheduledDateClientError] = useState("");
   const [state, formAction, isPending] = useActionState<
     CreateWorkOrderState,
     FormData
   >(createWorkOrder, initialCreateWorkOrderState);
 
+  const minScheduledDate = (() => {
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const now = new Date();
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(
+      now.getDate(),
+    )}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  })();
+
   function updateDraft<K extends keyof WorkOrderDraft>(
     field: K,
     value: WorkOrderDraft[K],
   ) {
     setDraft((previous) => ({ ...previous, [field]: value }));
-  }
-
-  useEffect(() => {
-    const pad = (n: number) => String(n).padStart(2, "0");
-    const now = new Date();
-    const local = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(
-      now.getDate(),
-    )}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    setMinScheduledDate(local);
-  }, []);
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    if (!draft.scheduledDate) return; // let required/browser handle empty
-    const t = new Date(draft.scheduledDate).getTime();
-    if (Number.isNaN(t) || t < Date.now()) {
-      event.preventDefault();
-      setScheduledDateClientError("Scheduled date must be in the future.");
-    }
   }
 
   return (

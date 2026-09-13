@@ -1,8 +1,9 @@
-# Data Model
+# Data model
 
 ## Entities
 
-### User (via Better Auth)
+### User (Better Auth)
+
 ```prisma
 model User {
   id            String              @id
@@ -26,7 +27,6 @@ model Account {
   userId      String
   password    String?
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // OAuth token fields are omitted here for brevity.
 }
 
 model Session {
@@ -52,6 +52,7 @@ enum Role {
 ```
 
 ### Customer
+
 ```prisma
 model Customer {
   id          String      @id @default(cuid())
@@ -66,6 +67,7 @@ model Customer {
 ```
 
 ### Technician
+
 ```prisma
 model Technician {
   id            String      @id @default(cuid())
@@ -74,7 +76,7 @@ model Technician {
   name          String
   email         String      @unique
   phone         String
-  skills        String[]    // Array of skill strings
+  skills        String[]
   status        TechStatus  @default(AVAILABLE)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
@@ -88,18 +90,16 @@ enum TechStatus {
 }
 ```
 
-Technician status is operational availability, not account lifecycle. `BUSY`
-is set when the technician starts work, and the final in-progress completion
-returns a non-Offline technician to `AVAILABLE`. `OFFLINE` temporarily prevents
-new assignments; it does not delete the account or unassign existing jobs.
-Name and email are duplicated for operational queries and are updated on both
-User and Technician in one transaction.
+Technician status is an operational availability state, not an account lifecycle
+state. `BUSY` is set when a technician starts a job; the final in-progress
+completion returns a non-offline technician to `AVAILABLE`.
 
-### WorkOrder (main feature)
+### Work order
+
 ```prisma
 model WorkOrder {
   id              String        @id @default(cuid())
-  jobNumber       Int           @unique @default(autoincrement()) // public reference, displayed as WO-0001
+  jobNumber       Int           @unique @default(autoincrement())
   title           String
   description     String
   customerId      String
@@ -133,19 +133,19 @@ enum WOStatus {
 }
 ```
 
-`CANCELLED` is a terminal status. The cancellation reason is stored in the
-corresponding `WorkOrderActivity.notes` value, together with the cancelling
-user, timestamp, previous status, and new status. No separate cancellation
-columns are required for the current workflow.
+`CANCELLED` is implemented and is treated as a terminal status for the current
+workflow. The cancellation reason and related context are recorded in the
+corresponding activity row.
 
-### WorkOrderActivity (audit trail)
+### WorkOrderActivity
+
 ```prisma
 model WorkOrderActivity {
   id          String   @id @default(cuid())
   workOrderId String
   workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
   userId      String
-  action      String   // e.g., "STATUS_CHANGED", "ASSIGNED", "COMPLETED"
+  action      String
   fromValue   String?
   toValue     String?
   notes       String?
@@ -154,30 +154,36 @@ model WorkOrderActivity {
 ```
 
 ## Relationships
+
 - User 1:1 Technician (optional)
-- User 1:N Account and Session (owned by Better Auth)
+- User 1:N Account and Session
 - Customer 1:N WorkOrder
 - Technician 1:N WorkOrder
 - WorkOrder 1:N WorkOrderActivity
 - User 1:N WorkOrderActivity
 
-## Schema / migrations
-- Prisma schema in `prisma/schema.prisma`.
-- Prisma 7 client output is generated into `generated/prisma` and uses the
-  PostgreSQL driver adapter in `lib/prisma.ts`.
-- Migrations via `npx prisma migrate dev`.
-- Seed via `npx prisma db seed` (`prisma/seed.ts`).
-- Passwords are hashed by Better Auth and stored in `Account.password`; do not
-  add a `User.passwordHash` field.
-- Technician provisioning creates User, credential Account, and Technician in
-  one transaction so a failed write cannot leave a partial login account.
+## Schema and migrations
 
-## Statuses & state machine
-Job flow (server-enforced):
-```
+- Prisma schema is in `prisma/schema.prisma`.
+- Prisma client generation is handled through the app setup and generated output.
+- Migrations are created and applied via Prisma CLI commands.
+- Seed data is defined in `prisma/seed.ts`.
+
+## Job state machine
+
+```text
 OPEN → ASSIGNED → IN_PROGRESS → COMPLETED
 ```
-- `CANCELLED` stays in the `WOStatus` enum but is a **future feature** — not implemented yet. No transition into it.
-- Cannot start without technician assigned.
-- Cannot complete without completion notes.
-- Every status update records user + timestamp.
+
+- Work orders cannot start without an assigned technician.
+- Completion requires notes.
+- Every status update is logged with the actor and timestamp.
+- Cancellation is allowed only in valid job states and is recorded as activity.
+
+## Planned future additions
+
+The following are not part of the current finished scope:
+
+- full account disable/terminate lifecycle
+- admin change log for account and role actions
+- email-based invite flow with secure token handling
