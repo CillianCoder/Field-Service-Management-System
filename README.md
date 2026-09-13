@@ -1,108 +1,117 @@
 # FieldFlow
 
-FieldFlow is a field service management system for dispatching work orders,
-tracking technician progress, and managing customer and operational records.
+FieldFlow is a field service management web application built for dispatch teams,
+field technicians, and operations managers. It helps coordinate jobs, assign work,
+track technician status, and maintain a clear operational overview in one system.
 
-## Current status
+Status: Core workflow implemented and verified for the main field-service use case.
 
-This repo represents the completed core system for the project scope defined in
-this workspace. The application includes the main operational flow for admins,
-dispatchers, and technicians.
+## Overview
 
-### Implemented features
+FieldFlow is designed for service-based businesses that need to manage:
 
-- Better Auth email/password authentication with protected routes
-- role-based authorization for Admin, Dispatcher, and Technician users
-- admin user management and account creation
-- customer CRUD with search and validation
-- technician management with status handling and offline conflict checks
-- work order creation, assignment, start, complete, and cancellation flows
-- dashboard metrics and recent job views
-- mobile-responsive card layouts for directory and dashboard pages
-- server-side Zod validation for all trusted form actions
+- customers and service sites
+- technician assignments
+- work-order lifecycle tracking
+- operational dashboard metrics
+- role-based access for admins, dispatchers, and technicians
 
-### Planned future work
+The system uses a Next.js App Router front end with Prisma and PostgreSQL on the
+backend, plus Better Auth for secure login and session management.
 
-- Resend email delivery for invite/reset flows
-- invite-link onboarding flow with first-time password setup
-- disable/terminate user account lifecycle
-- admin audit trail for account and role changes
-- expanded Playwright coverage for more operational scenarios
+## Core features
+
+### Admin & dispatcher tools
+
+- user creation and role management
+- customer management with validation
+- technician record management
+- work-order creation and assignment
+- dashboard overview with summary metrics and recent activity
+- cancellation handling for valid job states
+
+### Technician workflows
+
+- assignment-based job access
+- job start and completion actions
+- progress notes and completion details
+- technician availability and offline status handling
+
+### Security and validation
+
+- protected routes and server-side authorization
+- Zod validation for all key inputs
+- duplicate prevention for important records
+- secure environment-based secrets handling
+
+## Screenshots
+
+<div align="center">
+  <img src="docs/images/login.png" alt="FieldFlow login page" width="320" />
+  <img src="docs/images/dashboard.png" alt="FieldFlow dashboard" width="320" />
+</div>
+
+<div align="center">
+  <img src="docs/images/technician.png" alt="Technician workflow" width="320" />
+  <img src="docs/images/work-order.png" alt="Work order management" width="320" />
+</div>
+
+## Architecture
+
+```text
+Browser UI → Server Actions → Auth + Validation → Prisma ORM → PostgreSQL
+```
+
+The app is structured around a single Next.js application with clear separation
+between route logic, business actions, validation, and database access.
 
 ## Tech stack
 
-- Next.js App Router with React and TypeScript
+- Next.js App Router
+- React + TypeScript
 - Tailwind CSS
 - Better Auth
-- Prisma ORM with PostgreSQL on Neon
-- Zod validation
-- Playwright for browser-level verification
+- Prisma ORM
+- PostgreSQL on Neon
+- Playwright for validation flows
 
-## Local setup
+## Getting started
 
-1. Install dependencies with `npm install`.
-2. Copy `.env.example` to `.env` and fill in your local values.
-3. Generate the Prisma client with `npm run db:generate`.
-4. Run the initial database migration with `npm run db:migrate`.
-5. Seed demo users and data with `npm run db:seed`.
-6. Start the app with `npm run dev`.
+### Prerequisites
 
-The app runs at `http://localhost:3000`.
+- Node.js 18+
+- npm
+- PostgreSQL database
+- Git
 
-## Production deployment checklist
+### Install
 
-The project is set up for Vercel deployment with a Neon PostgreSQL database.
-Use the following checklist before or after deployment:
+```bash
+npm install
+cp .env.example .env
+```
 
-1. Set the production environment variables in Vercel:
-   - `DATABASE_URL`
-   - `BETTER_AUTH_SECRET`
-   - `BETTER_AUTH_URL` (production app URL)
-   - `ADMIN_DEMO_PASSWORD`
-   - `DISPATCHER_DEMO_PASSWORD`
-   - `TECHNICIAN_DEMO_PASSWORD`
-2. Ensure the Neon database is reachable from Vercel and uses the same Prisma schema.
-3. Run Prisma migration in production:
-   ```bash
-   npx prisma migrate deploy
-   ```
-4. Seed the demo accounts if you want the default login flows available in production:
-   ```bash
-   npx prisma db seed
-   ```
-5. Confirm the app URL is configured correctly for Better Auth callbacks.
-6. Verify the following flows in the deployed app:
-   - admin login
-   - dispatcher login
-   - technician login
-   - customer creation
-   - technician assignment
-   - work order start and completion
-   - role-based route protection
+### Configure environment variables
 
-## Available commands
+Update `.env` with your database and auth values.
 
-- `npm run dev` - start the development server
-- `npm run build` - build the production app
-- `npm run lint` - run ESLint
-- `npm run typecheck` - TypeScript strict check
-- `npm run test:e2e` - run Playwright tests
-- `npm run db:generate` - generate the Prisma client
-- `npm run db:migrate` - create and apply migrations
-- `npm run db:seed` - seed demo data
+### Run migrations and seed data
 
-## Repository structure
+```bash
+db:generate
+npm run db:migrate
+npm run db:seed
+```
 
-- `app/` - pages, layouts, and protected routes
-- `components/` - shared UI and layout components
-- `features/` - feature-specific pages and server actions
-- `lib/` - auth, validation, Prisma, and utilities
-- `prisma/` - schema, migrations, and seed data
-- `tests/e2e/` - Playwright end-to-end tests
+### Start the app
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:3000` in the browser.
 
 ## Demo accounts
-
-The seeded demo users are:
 
 ```text
 Admin: admin@fieldflow.test / ADMIN_DEMO_PASSWORD
@@ -110,31 +119,57 @@ Dispatcher: dispatch@fieldflow.test / DISPATCHER_DEMO_PASSWORD
 Technician: tech@fieldflow.test / TECHNICIAN_DEMO_PASSWORD
 ```
 
-## App screenshots
+## Project structure
 
-The project screenshots are stored in [docs/images](docs/images) and match the actual app views below.
-
-```md
-![Login screen](docs/images/login.png)
-![Dashboard](docs/images/dashboard.png)
-![Technician view](docs/images/technician.png)
-![Work order view](docs/images/work-order.png)
+```text
+app/
+components/
+features/
+lib/
+prisma/
+tests/
+docs/
 ```
 
-### Example layout
+## Deployment
 
-<div align="center">
-  <img src="docs/images/login.png" alt="Login screen" width="320" />
-  <img src="docs/images/dashboard.png" alt="Dashboard" width="320" />
-</div>
+The project is set up for deployment on Vercel with PostgreSQL on Neon.
 
-<div align="center">
-  <img src="docs/images/technician.png" alt="Technician view" width="320" />
-  <img src="docs/images/work-order.png" alt="Work order view" width="320" />
-</div>
+Required environment variables include:
 
-## Notes
+- `DATABASE_URL`
+- `BETTER_AUTH_SECRET`
+- `BETTER_AUTH_URL`
+- demo password variables
 
-- Do not commit real secrets or production credentials.
-- Use `.env` only locally and set environment variables in deployment settings.
-- Future email and onboarding improvements should be tracked in the GitHub backlog instead of treated as current feature parity.
+Production verification checklist:
+
+1. Set env vars in the deployment platform.
+2. Run Prisma migrations.
+3. Seed the database if demo accounts are needed.
+4. Confirm login, role checks, and work-order flows work in production.
+
+## Documentation
+
+Detailed project documentation is available in:
+
+- [docs/architecture.md](docs/architecture.md)
+- [docs/api.md](docs/api.md)
+- [docs/data-model.md](docs/data-model.md)
+- [docs/requirements.md](docs/requirements.md)
+- [docs/testing.md](docs/testing.md)
+
+## Roadmap / future work
+
+The following items are intentionally kept in the backlog instead of being treated
+as current project requirements:
+
+- Resend-based email delivery for reset and invite flows
+- invite-link onboarding flow
+- disable/terminate account lifecycle
+- audit trail for admin account actions
+- broader Playwright regression coverage
+
+## License
+
+This project is licensed under the MIT License.
